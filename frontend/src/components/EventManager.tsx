@@ -61,7 +61,7 @@ export default function EventManager({ initialEvent, initialStats }: { initialEv
           <p className="mt-1 flex flex-wrap items-center gap-3 text-muted"><span className="tag">{event.status}</span>
             {event.status !== 'DRAFT' && <Link className="underline underline-offset-4" href={`/e/${event.slug}`}>Public page</Link>}</p>
         </div>
-        {event.status === 'PUBLISHED' && <Link className="btn btn-primary" href={`/dashboard/events/${event.id}/checkin`}>Open scanner</Link>}
+        {event.status === 'PUBLISHED' && <Link className="btn btn-primary" href={`/organizer/events/${event.id}/checkin`}>Open scanner</Link>}
       </div>
 
       <div role="tablist" aria-label="Event sections" className="mt-6 flex flex-wrap gap-1 border-b border-line">
@@ -90,7 +90,7 @@ export default function EventManager({ initialEvent, initialStats }: { initialEv
               {event.status === 'DRAFT' && <button className="btn btn-primary" disabled={busy} onClick={() => act('Published. Registration opens at the time you set.', () => api(`/events/${event.id}/publish`, { method: 'POST', body: {} }))}>Publish</button>}
               {event.status === 'PUBLISHED' && <button className="btn" disabled={busy} onClick={() => act('Marked as completed.', () => api(`/events/${event.id}/complete`, { method: 'POST', body: {} }), 'Mark this event as completed? Registration closes for good.')}>Mark completed</button>}
               {event.status === 'PUBLISHED' && <button className="btn btn-danger" disabled={busy} onClick={() => act('Event cancelled. Every active booking was cancelled.', () => api(`/events/${event.id}/cancel`, { method: 'POST', body: {} }), 'Cancel this event? All registrations are cancelled. This cannot be undone.')}>Cancel event</button>}
-              {event.status === 'DRAFT' && <button className="btn btn-danger" disabled={busy} onClick={() => act('Deleted.', async () => { await api(`/events/${event.id}`, { method: 'DELETE' }); router.push('/dashboard'); }, 'Delete this draft?')}>Delete draft</button>}
+              {event.status === 'DRAFT' && <button className="btn btn-danger" disabled={busy} onClick={() => act('Deleted.', async () => { await api(`/events/${event.id}`, { method: 'DELETE' }); router.push('/organizer'); }, 'Delete this draft?')}>Delete draft</button>}
             </div>
 
             {editable && (

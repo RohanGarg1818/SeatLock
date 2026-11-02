@@ -5,11 +5,18 @@ import { createApp } from './app.js';
 import { startSweeper } from './sweeper.js';
 import { createRedisLayer } from './redisLayer.js';
 import { createMailer } from './mailer.js';
+import { migrate } from '../db/migrate.js';
 
 const config = loadConfig();
 const log = createLogger({ level: config.logLevel });
 const pool = createPool(config);
 const ctx = { config, pool, redis: null, log };
+
+// Apply any pending migrations before serving. They are idempotent (each runs once, in order), so a deploy
+// can never run new code against an old schema, which is what made every login fail after the organizer-portal update.
+if (process.env.AUTO_MIGRATE !== 'false') {
+  try { await migrate(pool, (m) => log.info('migration', { m })); } catch (e) { log.error('startup migration failed', { err: e.message }); process.exit(1); }
+}
 ctx.mailer = createMailer(ctx);
 ctx.redis = createRedisLayer(ctx); // null when Redis is not configured
 

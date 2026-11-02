@@ -18,7 +18,6 @@ export default async function Ticket({ params }: { params: Promise<{ bookingId: 
 
   return (
     <div className="mx-auto max-w-md">
-      <p className="eyebrow">Ticket</p>
       <h1 className="display mt-2 text-4xl">{booking.event_title}</h1>
       <p className="mt-2 text-muted">{booking.event_starts_at && `${fmtDate(booking.event_starts_at)}, ${fmtTime(booking.event_starts_at)}`} · {booking.event_venue}</p>
       <p className="mt-1 font-medium">{user.name}</p>

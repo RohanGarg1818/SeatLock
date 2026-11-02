@@ -37,7 +37,7 @@ export default function AdminEvents() {
                 <td className="pr-4">{fmtDateTime(e.starts_at)}</td>
                 <td className="pr-4">{e.confirmed_count} / {e.capacity}</td>
                 <td className="pr-4">{e.waitlist_count}</td>
-                <td><Link className="btn btn-sm" href={`/dashboard/events/${e.id}`}>Manage</Link></td>
+                <td><Link className="btn btn-sm" href={`/organizer/events/${e.id}`}>Manage</Link></td>
               </tr>
             ))}
           </tbody>

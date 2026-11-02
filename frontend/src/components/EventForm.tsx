@@ -67,7 +67,7 @@ export default function EventForm({ event, locked = false, onSaved }: { event?: 
         setSaved(true); onSaved?.(r.event); router.refresh();
       } else {
         const r = await api<{ event: OrganizerEvent }>('/events', { body: { ...body, capacity: Number(f.capacity) } });
-        router.push(`/dashboard/events/${r.event.id}`);
+        router.push(`/organizer/events/${r.event.id}`);
         return;
       }
     } catch (err) {

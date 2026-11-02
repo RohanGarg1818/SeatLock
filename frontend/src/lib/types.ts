@@ -1,5 +1,5 @@
 export type Role = 'participant' | 'organizer' | 'admin';
-export interface User { id: string; name: string; email: string; role: Role }
+export interface User { id: string; name: string; email: string; role: Role; organization?: string }
 
 export type RegState = 'NOT_OPEN' | 'OPEN' | 'SOLD_OUT' | 'CLOSED' | 'CANCELLED';
 export type QuestionType = 'text' | 'long_text' | 'email' | 'phone' | 'number' | 'select' | 'checkbox';

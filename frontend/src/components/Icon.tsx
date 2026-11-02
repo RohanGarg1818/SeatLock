@@ -3,6 +3,7 @@ const P: Record<string, React.ReactNode> = {
   arrow: <><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></>,
   check: <path d="m5 12.5 4.5 4.5L19 7.5" />,
   menu: <><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></>,
+  plus: <><path d="M12 5v14" /><path d="M5 12h14" /></>,
   close: <><path d="M6 6l12 12" /><path d="M18 6 6 18" /></>,
   search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>,
   calendar: <><rect x="3.5" y="5" width="17" height="15.5" rx="3" /><path d="M8 3v4M16 3v4M3.5 10h17" /></>,

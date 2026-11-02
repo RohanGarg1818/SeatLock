@@ -6,7 +6,7 @@ import Icon from './Icon';
 import ThemeToggle from './ThemeToggle';
 import LogoutButton from './LogoutButton';
 
-interface Props { user: { name: string; role: string } | null }
+interface Props { user: { name: string; role: string } | null; volunteers?: boolean }
 
 const PUBLIC_LINKS = [
   { href: '/#events', label: 'Events' },
@@ -15,7 +15,7 @@ const PUBLIC_LINKS = [
   { href: '/#faq', label: 'FAQ' },
 ];
 
-export default function NavMenu({ user }: Props) {
+export default function NavMenu({ user, volunteers = false }: Props) {
   const [open, setOpen] = useState(false);
   const path = usePathname();
   useEffect(() => { setOpen(false); }, [path]);
@@ -26,10 +26,9 @@ export default function NavMenu({ user }: Props) {
     return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
   }, [open]);
 
-  const staff = user && (user.role === 'organizer' || user.role === 'admin');
   const account = user ? [
     { href: '/me', label: 'My tickets' },
-    ...(staff ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
+    ...(volunteers ? [{ href: '/dashboard', label: 'Gate scanner' }] : []),
     ...(user.role === 'admin' ? [{ href: '/admin', label: 'Admin' }] : []),
   ] : [];
   const link = 'rounded-lg px-3 py-2 text-[0.95rem] font-medium text-muted transition-colors hover:bg-surface-2 hover:text-fg';
@@ -43,10 +42,11 @@ export default function NavMenu({ user }: Props) {
       </nav>
       <div className="ml-auto hidden items-center gap-2 lg:flex">
         {account.map((l) => <Link key={l.href} href={l.href} className={link + active(l.href)}>{l.label}</Link>)}
+        <Link href="/organizer/login" className={link}>For organizers</Link>
         <ThemeToggle />
         {user ? (
           <>
-            <span className="ml-1 grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-accent to-accent-2 text-sm font-bold text-accent-ink" title={user.name} aria-label={`Signed in as ${user.name}`}>{user.name.trim().charAt(0).toUpperCase()}</span>
+            <span className="ml-1 grid h-9 w-9 place-items-center rounded-[4px] bg-accent text-sm font-bold text-accent-ink" title={user.name} aria-label={`Signed in as ${user.name}`}>{user.name.trim().charAt(0).toUpperCase()}</span>
             <LogoutButton className="btn btn-sm btn-ghost" />
           </>
         ) : (
@@ -68,12 +68,12 @@ export default function NavMenu({ user }: Props) {
         <div id="mobile-menu" className="fixed inset-x-0 bottom-0 top-16 z-30 overflow-y-auto bg-bg px-4 pb-10 pt-4 lg:hidden">
           <nav aria-label="Mobile" className="mx-auto flex max-w-md flex-col">
             {user && (
-              <div className="mb-3 flex items-center gap-3 rounded-2xl border border-line bg-surface p-4">
-                <span className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-accent to-accent-2 font-bold text-accent-ink">{user.name.trim().charAt(0).toUpperCase()}</span>
+              <div className="mb-3 flex items-center gap-3 rounded-md border-[1.5px] border-line bg-surface p-4">
+                <span className="grid h-11 w-11 place-items-center rounded-[4px] bg-accent font-bold text-accent-ink">{user.name.trim().charAt(0).toUpperCase()}</span>
                 <div><p className="font-semibold leading-tight">{user.name}</p><p className="text-sm capitalize text-muted">{user.role}</p></div>
               </div>
             )}
-            {[...account, ...PUBLIC_LINKS].map((l) => (
+            {[...account, ...PUBLIC_LINKS, { href: '/organizer/login', label: 'For organizers' }].map((l) => (
               <Link key={l.href} href={l.href} className="flex items-center justify-between border-b border-line py-4 text-lg font-medium">{l.label}<Icon name="arrow" className="text-muted" /></Link>
             ))}
             <div className="mt-6 grid gap-3">

@@ -17,7 +17,6 @@ export default async function MyBookings() {
   const label = { HELD: 'Seat held: finish registering', CONFIRMED: 'Registered', CANCELLED: 'Cancelled', EXPIRED: 'Expired' } as const;
   return (
     <>
-      <p className="eyebrow">Your account</p>
       <h1 className="display mt-1 text-4xl sm:text-5xl">My registrations</h1>
       {waiting.length > 0 && (
         <section className="mt-6" aria-labelledby="wl-h">

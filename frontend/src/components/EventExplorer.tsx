@@ -32,8 +32,8 @@ export default function EventExplorer({ events }: { events: PublicEvent[] }) {
       </div>
       <p className="mt-4 text-sm text-muted" aria-live="polite">{shown.length} event{shown.length === 1 ? '' : 's'}</p>
       {shown.length > 0 ? (
-        <ul className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {shown.map((e) => <li key={e.id}><EventCard e={e} /></li>)}
+        <ul className="mt-5 grid gap-5 lg:grid-cols-2">
+          {shown.map((e) => <li key={e.id} className="reveal"><EventCard e={e} /></li>)}
         </ul>
       ) : (
         <div className="card mt-5 grid place-items-center gap-2 px-6 py-14 text-center">

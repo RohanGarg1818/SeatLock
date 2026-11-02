@@ -1,13 +1,12 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/client';
 import { safeNext } from '@/lib/format';
 import Icon, { Logo } from './Icon';
 
 export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
-  const router = useRouter();
   const next = safeNext(useSearchParams().get('next'));
   const [error, setError] = useState<string | null>(null);
   const [fields, setFields] = useState<Record<string, string>>({});
@@ -19,8 +18,8 @@ export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
     const f = new FormData(e.currentTarget);
     try {
       await api(`/auth/${mode}`, { body: Object.fromEntries(f) });
-      router.replace(next);
-      router.refresh(); // re-run server components so the header shows the logged-in state
+      // A full page load: one request for the next page with the new cookie, instead of a client navigation plus a refresh (two server renders).
+      window.location.assign(next);
     } catch (err) {
       if (err instanceof ApiError) { setError(err.message); setFields(err.details?.fields ?? {}); } else setError('Something went wrong.');
       setBusy(false);
@@ -31,10 +30,8 @@ export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
     ? ['Your tickets, always one tap away', 'Continue a seat you are still holding', 'See your place on any waitlist']
     : ['Hold a seat in one click', 'A QR ticket the moment you confirm', 'Automatic waitlist when events fill up'];
   return (
-    <div className="mx-auto grid max-w-5xl overflow-hidden rounded-[2rem] border border-line bg-surface shadow-[var(--shadow-lg)] lg:grid-cols-[0.9fr_1fr]">
-      <aside className="relative isolate hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-indigo-700 via-violet-700 to-fuchsia-700 p-10 text-white lg:flex">
-        <div className="absolute inset-0 -z-10 opacity-30" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,.6) 1px, transparent 1.5px)', backgroundSize: '22px 22px', maskImage: 'linear-gradient(160deg, #000, transparent 75%)' }} />
-        <div className="absolute -bottom-20 -right-16 -z-10 h-72 w-72 rounded-full bg-orange-400/35 blur-3xl" />
+    <div className="mx-auto grid max-w-5xl overflow-hidden rounded-md border-[1.5px] border-[var(--ink-line)] bg-surface lg:grid-cols-[0.9fr_1fr]">
+      <aside className="relative isolate hidden flex-col justify-between overflow-hidden bg-[#11151a] p-10 text-white lg:flex">
         <div className="flex items-center gap-2.5"><Logo /><span className="display text-2xl">SeatLock</span></div>
         <div>
           <p className="display text-4xl leading-tight">{isLogin ? 'Good to see you again.' : 'Your seat is one click away.'}</p>

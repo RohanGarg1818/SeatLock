@@ -403,7 +403,19 @@ strand a seat. With no `RESEND_API_KEY` / `MAIL_FROM` it does nothing. The tests
 
 **What it does not prove.** It checks the state after a run, on one machine, with the failures listed above. It does not kill Postgres or the API process, it does not test multiple API instances, and a passing run is evidence rather than a proof.
 
-## 25. Other decisions
+## 25. Two portals, two sessions
+
+Attendees and organizers are different people doing different jobs, so they get different sites and different logins.
+
+- **Two cookies, two token audiences.** The website uses `seatlock_token` and the organizer portal uses `seatlock_org_token`. Every JWT carries an `aud` claim (`attendee` or `organizer`). The guard for each portal checks the claim, so an attendee token is simply "not logged in" on organizer routes and the other way round (the API answers 401, not 403, because from that portal's point of view nobody is logged in).
+- **Separate sign-up and login.** `POST /organizer/auth/register|login|logout`, `GET /organizer/auth/me`. Organizers also give their society name. An organizer account cannot log in on the website and an attendee account cannot log in on the portal (`403 WRONG_PORTAL`, only after the password is verified, so it leaks nothing to a stranger).
+- **Admins** still log in on the website (`/admin`). They may also log in on the portal, to help an organizer.
+- **Gate scanning** works from both: `POST /checkin` uses `requireEither`, because volunteers scan on the website and organizers scan in their portal.
+- **One guard factory** (`guard(aud, ...roles)` in `middleware/auth.js`) builds both guards, so they cannot drift apart. Role changes still apply immediately because the user is re-read from the database on every request.
+- **Frontend.** Next.js route groups: `(site)` has the attendee header and footer, `organizer/(auth)` is a bare login page, `organizer/(portal)` has its own header and redirects to the portal login when there is no organizer session.
+- Covered by `test/organizer-auth.test.js` (6 tests) and the browser script `e2e3` (26 checks).
+
+## 26. Other decisions
 
 - **Graceful shutdown** (`server.js`): on SIGTERM stop the sweeper, stop accepting connections, wait for in-flight requests, then close Redis and the pool (a deploy must not cut a booking in half).
 - **Pool timeouts** (`db.js`): `statement_timeout` 15 s and `idle_in_transaction_session_timeout` 15 s so one stuck request cannot hold row locks forever; `connectionTimeoutMillis` 5 s so an exhausted pool fails fast.

@@ -26,7 +26,7 @@ It happens because the code reads the seat count, checks it, and writes it back 
 I fixed it at the database. Taking a seat is a single conditional `UPDATE ... WHERE seats_left > 0`, so the check and the decrement
 are one atomic statement; a database `CHECK` constraint and a unique index are backup layers underneath. A person gets a five-minute
 hold on the seat while they fill in the form, and a sweeper returns expired holds. I proved it with a race demo: 200 simultaneous
-requests for 20 seats, the naive version booked 54, mine booked exactly 20; and an integration suite of 91 tests against a real
+requests for 20 seats, the naive version booked 54, mine booked exactly 20; and an integration suite of 97 tests against a real
 Postgres. The site also has a Chaos Lab: I can fire a crowd at an event while switching on double clicks, a dead cache, cancellations and expiring holds, and an independent checker re-derives every seat number from the raw bookings. With a sabotage switch that swaps in the broken code, it turns red, so you can see it is not rigged. Redis sits in front as an optional speed-up for sold-out rushes: it can only ever say 'sold out' too early, never oversell,
 and the app works with Redis switched off. On top of that there are signed QR tickets, a volunteer check-in scanner, a streamed CSV
 export, a waitlist that hands a freed seat to the next person in line inside the same transaction, and a Next.js site with link previews."

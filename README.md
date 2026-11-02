@@ -41,8 +41,8 @@ the first person in line inside the same transaction, as a normal hold.
 | Portal | Who | Where | What they do |
 |---|---|---|---|
 | **User** | any signed-up person | `/`, `/e/<slug>`, `/me`, `/me/tickets/<id>` | browse events, register (seat held while they fill the form), join a waitlist, get a QR ticket, cancel |
-| **Organizer** | role `organizer` (or admin) | `/dashboard`, `/dashboard/events/<id>` | create events with custom questions, publish, change capacity, see live seats and waitlist, registrations table, CSV export, add volunteers, activity log, cancel the event |
-| **Scanner** | organizer, admin, or a volunteer added to that event | `/dashboard/events/<id>/checkin` | scan the QR: shows name, email and every answer, then checks the person in once. "Verify only" mode looks without checking in |
+| **Organizer** | role `organizer`, own sign-up and login at `/organizer/signup`, `/organizer/login` (an admin may log in there too) | `/organizer`, `/organizer/events/<id>` | create events with custom questions, publish, change capacity, see live seats and waitlist, registrations table, CSV export, add volunteers, activity log, cancel the event |
+| **Scanner** | organizer, admin, or a volunteer added to that event | `/dashboard/events/<id>/checkin` (volunteers) or `/organizer/events/<id>/checkin` (organizers) | scan the QR: shows name, email and every answer, then checks the person in once. "Verify only" mode looks without checking in |
 | **Admin** | role `admin` | `/admin` | platform numbers, every organizer's events (with a Manage link), promote/demote users |
 
 **What the QR contains.** The QR holds only a signed reference (booking id, event id, HMAC signature), not the person's data. The
@@ -96,14 +96,14 @@ cd backend && npm run race-demo -- --capacity 20 --requests 200
 
 It fires 200 simultaneous requests at a 20-seat event, first with a naive "read, then write back" implementation and then with the
 real one. The naive one books more than 20; the real one books exactly 20. The same demo is on the website at
-`/dashboard/demo` (log in as the organizer; needs `ENABLE_DEMO=true`).
+`/organizer/lab` (log in on the organizer portal; needs `ENABLE_DEMO=true`).
 
 ### Tests
 
 Tests use a **real** Postgres (never mocked) and real Redis (database 1). The Docker Postgres creates the `seatlock_test` database for you on first start (if you use your own Postgres, create one named `seatlock_test`). Then run:
 
 ```bash
-npm test                                                          # 91 tests, ~30 s (needs Postgres and Redis running)
+npm test                                                          # 97 tests, ~30 s (needs Postgres and Redis running)
 ```
 
 `TEST_DATABASE_URL` must contain "test" in its database name; the suite truncates every table and refuses to run otherwise.
@@ -190,7 +190,7 @@ IDs are returned as strings. "Organizer" means organizer or admin; organizers on
 | `DELETE /events/:id/waitlist` | logged in | 204 | 404 `NOT_ON_WAITLIST` |
 | `GET /me/waitlist` | logged in | 200 my places in line | |
 | `POST /checkin` `{token, event_id?, preview?}` | organizer, admin, or volunteer **of that event** | 200 `{result:"OK" or "VALID", attendee, email, details:[{label,value}], registered_at,...}`; `preview:true` changes nothing | 400 `INVALID_TICKET` / `WRONG_EVENT`, 403 `NOT_STAFF`, 409 `ALREADY_CHECKED_IN` / `BOOKING_CANCELLED` / `NOT_CONFIRMED`, 404 |
-| `GET /events` | organizer | 200 own events with counts | 403 |
+| `GET /events` | organizer | 200 own events with counts | 401 |
 | `POST /events` | organizer | 201 (slug generated) | 422 |
 | `GET /events/:id` | owner/admin | 200 | 404 |
 | `PATCH /events/:id` | owner/admin | 200 (draft or published) | 409 `EVENT_NOT_EDITABLE` / `QUESTIONS_LOCKED`, 422 |
@@ -221,7 +221,7 @@ also appears in the logs.
 
 Most event sites claim they never oversell. SeatLock lets you try to make it fail.
 
-- **Chaos Lab** (organizer dashboard, **Race demo** page, needs `ENABLE_DEMO=true`): sends a crowd of real HTTP requests at a throwaway event while you switch on failures: double-click retries, a second browser tab, Redis dying mid-rush, waitlist promotions, cancellations, and holds timing out under the sweeper. Afterwards an independent checker re-derives every seat number from the raw bookings and reports each rule as pass or fail.
+- **Chaos Lab** (organizer portal, **Race & Chaos Lab** page, needs `ENABLE_DEMO=true`): sends a crowd of real HTTP requests at a throwaway event while you switch on failures: double-click retries, a second browser tab, Redis dying mid-rush, waitlist promotions, cancellations, and holds timing out under the sweeper. Afterwards an independent checker re-derives every seat number from the raw bookings and reports each rule as pass or fail.
 - **Sabotage switch**: swaps the real booking code for the deliberately broken read-then-write version. The verdict must turn red, which shows the checker is not rigged.
 - **Integrity check** (any event, any time): the **Overview** tab of an event has a read-only button that runs the same checker on real data. API: `GET /events/:id/integrity` (organizer who owns it, or admin).
 - Code: `backend/src/services/integrity.js` (the rules), `backend/src/services/chaos.js` (the experiment), `backend/test/chaos.test.js`.

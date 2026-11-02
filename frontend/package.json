@@ -12,6 +12,7 @@
     "prebuild": "npm run copy-wasm"
   },
   "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
     "@fontsource-variable/fraunces": "^5.3.0",
     "@fontsource-variable/instrument-sans": "^5.3.0",
     "@yudiel/react-qr-scanner": "^2.6.0",

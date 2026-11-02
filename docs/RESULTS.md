@@ -44,7 +44,7 @@ In naive mode `seats_left` also ends up wrong (here it read 0 although 54 bookin
 
 Command: `cd backend && npm test` (real PostgreSQL 16 test database + real Redis; no mocked database anywhere)
 
-Result of the last full run in this session: **91 tests, 91 passed, 0 failed**, about 30 seconds.
+Result of the last full run in this session: **97 tests, 97 passed, 0 failed**, about 30 seconds.
 Files: `race.test.js` (7), `product.test.js` (27), `ops.test.js` (16), `redis.test.js` (13), `waitlist.test.js` (9), `waitlist-redis.test.js` (1), `chaos.test.js` (11), `checkin-details.test.js` (2), `mail.test.js` (3), `admin.test.js` (2).
 The concurrency tests run the core invariant query (`active bookings <= capacity` and `seats_left == capacity - active`) afterwards.
 The Redis tests flush Redis database 1 and the test database is truncated per file, so run them only against a throw-away database

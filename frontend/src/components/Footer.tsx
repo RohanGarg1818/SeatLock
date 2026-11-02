@@ -1,33 +1,23 @@
 import Link from 'next/link';
-import { Logo } from './Icon';
 
-const cols = [
-  { title: 'Explore', links: [['Upcoming events', '/#events'], ['How it works', '/#how'], ['Features', '/#features'], ['FAQ', '/#faq']] },
-  { title: 'Your account', links: [['Log in', '/login'], ['Create an account', '/register'], ['My tickets', '/me']] },
-  { title: 'For organizers', links: [['Create an event', '/dashboard/events/new'], ['Dashboard', '/dashboard'], ['Gate scanner', '/dashboard']] },
-];
+// The back of the card: a paper panel with a scalloped top edge, a short message on the left, the addresses on the right.
+const LINKS: [string, string][] = [['Upcoming events', '/#events'], ['Create an account', '/register'], ['My tickets', '/me'], ['Organizer portal', '/organizer/login'], ['Volunteer gate scanner', '/dashboard']];
 
 export default function Footer() {
   return (
-    <footer className="mt-24 border-t border-line bg-surface">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_repeat(3,1fr)]">
-        <div>
-          <div className="flex items-center gap-2.5"><Logo /><span className="display text-2xl">SeatLock</span></div>
-          <p className="mt-4 max-w-xs text-muted">Event registration for college societies, where every seat is handed out exactly once, even when the whole campus clicks at the same second.</p>
-        </div>
-        {cols.map((c) => (
-          <nav key={c.title} aria-label={c.title}>
-            <p className="eyebrow">{c.title}</p>
-            <ul className="mt-4 space-y-2.5">
-              {c.links.map(([label, href]) => <li key={label}><Link className="text-[0.95rem] text-muted transition-colors hover:text-fg" href={href}>{label}</Link></li>)}
+    <footer className="mt-24 bg-[#2b2622] pt-16">
+      <div className="mx-auto max-w-6xl px-4 pb-10 sm:px-6">
+        <div className="scallop bg-[#f6f2f0] px-6 pb-8 pt-16 text-[#2b2622] sm:px-12">
+          <div className="grid gap-8 md:grid-cols-2">
+            <div>
+              <p className="display text-4xl">SeatLock</p>
+              <p className="mt-3 max-w-sm">Event registration for college societies. Every seat is handed out once, even when the whole campus clicks at the same second.</p>
+            </div>
+            <ul className="space-y-2.5 text-lg">
+              {LINKS.map(([label, href]) => <li key={label}><Link className="underline-offset-4 hover:underline" href={href}>{label}</Link></li>)}
             </ul>
-          </nav>
-        ))}
-      </div>
-      <div className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© {new Date().getFullYear()} SeatLock. Free to register, always one seat per person.</p>
-          <p>Times are shown in IST.</p>
+          </div>
+          <p className="mt-10 text-center text-sm text-[#5f5753]">© {new Date().getFullYear()} SeatLock. Free to register, one seat per person. Times are shown in IST.</p>
         </div>
       </div>
     </footer>

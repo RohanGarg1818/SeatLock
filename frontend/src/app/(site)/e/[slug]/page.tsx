@@ -66,8 +66,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
           <dl className="mt-8 grid gap-3 sm:grid-cols-3">
             {info.map((i) => (
               <div key={i.k} className="card flex items-start gap-3 p-4">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface-2 text-accent-text ring-1 ring-line"><Icon name={i.icon} size={19} /></span>
-                <div className="min-w-0"><dt className="eyebrow">{i.k}</dt><dd className="mt-0.5 font-semibold leading-snug">{i.v}</dd>{i.sub && <dd className="text-sm text-muted">{i.sub}</dd>}</div>
+                <div className="min-w-0"><dt className="text-sm text-muted">{i.k}</dt><dd className="mt-0.5 font-semibold leading-snug">{i.v}</dd>{i.sub && <dd className="text-sm text-muted">{i.sub}</dd>}</div>
               </div>
             ))}
           </dl>
@@ -85,7 +84,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
 
       {/* Phone: a bar pinned to the bottom so the action is always one tap away. */}
       {e.registration_state === 'OPEN' && !my_booking && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-[color-mix(in_srgb,var(--bg)_90%,transparent)] px-4 py-3 backdrop-blur-xl lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-30 bg-surface px-4 py-3 lg:hidden">
           <div className="mx-auto flex max-w-md items-center justify-between gap-4">
             <p className="text-sm leading-tight"><b className="display text-xl">{e.seats_left}</b><span className="text-muted"> seats left</span></p>
             <a href="#register" className="btn btn-primary">Go to registration</a>
