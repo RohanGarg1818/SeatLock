@@ -13,7 +13,6 @@ answer wrong in the safe direction ("sold out" too early) but cannot cause an ov
 - What was measured and what was not: [docs/RESULTS.md](docs/RESULTS.md)
 - Why each design decision was made: [docs/DESIGN.md](docs/DESIGN.md)
 - Interview preparation (walkthrough, 40 Q&As, pitch, demo script): [INTERVIEW.md](INTERVIEW.md)
-- Build plan and status log: [PLAN.md](PLAN.md)
 
 ## Architecture
 

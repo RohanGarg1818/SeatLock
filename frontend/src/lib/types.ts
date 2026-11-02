@@ -9,7 +9,7 @@ export interface PublicEvent {
   id: string; slug: string; title: string; tagline: string; description_md?: string; venue: string;
   mode: 'offline' | 'online' | 'hybrid'; starts_at: string; ends_at: string;
   registration_opens_at: string; registration_closes_at: string | null; capacity: number; seats_left: number;
-  banner_url: string | null; status: string; registration_state: RegState;
+  banner_url: string | null; status: string; host?: string | null; registration_state: RegState;
   waitlist_count?: number; hold_minutes?: number; allowed_email_domains?: string[] | null; registration_questions?: Question[]; server_time?: string;
 }
 export interface MyWaitlist { position: number }

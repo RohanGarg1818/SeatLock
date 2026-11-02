@@ -5,7 +5,8 @@ import { AppError } from '../errors.js';
 import { REG_STATE_SQL } from '../util.js';
 
 const LIST_COLS = `e.id, e.slug, e.title, e.tagline, e.venue, e.mode, e.starts_at, e.ends_at, e.registration_opens_at,
-  e.registration_closes_at, e.capacity, e.seats_left, e.banner_url, e.status`;
+  e.registration_closes_at, e.capacity, e.seats_left, e.banner_url, e.status,
+  (SELECT u.organization FROM users u WHERE u.id = e.organizer_id) AS host`; // the society or club that runs it
 
 // iCalendar rules: escape \ ; , and newlines in text; lines are folded at 75 octets with CRLF + space.
 const icsEscape = (s) => String(s).replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');

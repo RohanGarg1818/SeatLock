@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getOrganizer } from '@/lib/server';
-import OrgHeader from '@/components/OrgHeader';
+import OrgHeader from '@/components/organizer/OrgHeader';
 
 // Everything under /organizer except login and sign-up needs an organizer session.
 // The API checks again on every request: this redirect only gives a friendly page instead of an error.

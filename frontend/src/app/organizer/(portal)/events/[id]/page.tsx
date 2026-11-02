@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { serverFetch } from '@/lib/server';
 import type { EventStats, OrganizerEvent } from '@/lib/types';
-import EventManager from '@/components/EventManager';
+import EventManager from '@/components/organizer/EventManager';
 
 export const metadata = { title: 'Manage event' };
 

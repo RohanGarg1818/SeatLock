@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { serverFetch } from '@/lib/server';
 import type { StaffEvent } from '@/lib/types';
-import Scanner from '@/components/Scanner';
+import Scanner from '@/components/organizer/Scanner';
 
 export const metadata = { title: 'Check-in scanner' };
 

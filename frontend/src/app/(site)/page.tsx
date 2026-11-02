@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { publicFetch } from '@/lib/server';
 import type { PublicEvent } from '@/lib/types';
-import EventExplorer from '@/components/EventExplorer';
-import TicketHero from '@/components/TicketHero';
-import Ticker from '@/components/Ticker';
-import Faq from '@/components/Faq';
-import { HoldTimer, Queue, SeatPlan, TicketArt } from '@/components/Pictures';
+import EventExplorer from '@/components/events/EventExplorer';
+import TicketHero from '@/components/home/TicketHero';
+import Ticker from '@/components/home/Ticker';
+import Proof from '@/components/home/Proof';
+import Faq from '@/components/ui/Faq';
+import { HoldTimer, Queue, SeatPlan, TicketArt } from '@/components/ui/Pictures';
 
 // Each sheet slides up over the one before it. Fills come from the page's palette, ink chosen per sheet.
 const SHEETS = [
@@ -75,6 +76,8 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      <Proof />
 
       {/* how it works: an itinerary on a slip */}
       <section id="how" className="scroll-mt-24 pt-20 sm:pt-28" aria-labelledby="how-h">

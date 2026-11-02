@@ -89,7 +89,7 @@ in the application on a value read earlier.
 
 Follow one logged-in student clicking Register on `/e/hackipu-2026`, with Redis on.
 
-1. **Browser.** `frontend/src/components/RegisterPanel.tsx`, function `register()`. It creates an idempotency key **once per attempt** (and reuses it if the request is retried) and calls `api('/events/:id/hold', ...)` from `frontend/src/lib/client.ts`.
+1. **Browser.** `frontend/src/components/events/RegisterPanel.tsx`, function `register()`. It creates an idempotency key **once per attempt** (and reuses it if the request is retried) and calls `api('/events/:id/hold', ...)` from `frontend/src/lib/client.ts`.
 2. **Same-origin proxy.** The call goes to `/api/events/:id/hold` on the *website*. `frontend/next.config.ts` (`rewrites`) forwards it to `API_URL`. The auth cookie travels with it because to the browser it is a first-party cookie.
 3. **Express setup.** `backend/src/app.js`, `createApp`: `requestLogger` (`logger.js`) assigns an `X-Request-Id` using `AsyncLocalStorage`; the `no-store` header; `express.json` with a 100 kb limit.
 4. **Route.** `backend/src/routes/bookings.js`, `POST /events/:id/hold`. Middleware order: `requireAuth` then `limit`.
@@ -162,14 +162,14 @@ Follow one logged-in student clicking Register on `/e/hackipu-2026`, with Redis 
 | `app/page.tsx` | Public event list |
 | `app/e/[slug]/page.tsx` | Event page: `generateMetadata` (Open Graph), details, `RegisterPanel` |
 | `app/e/[slug]/og/route.tsx` | Generated Open Graph image |
-| `components/RegisterPanel.tsx` | The registration state machine in the browser: hold, countdown, form, confirm, release, errors, polling seats |
+| `components/events/RegisterPanel.tsx` | The registration state machine in the browser: hold, countdown, form, confirm, release, errors, polling seats |
 | `app/me/page.tsx`, `app/me/tickets/[bookingId]/page.tsx` | My registrations, the QR ticket |
 | `app/dashboard/**` | Organizer dashboard, event manager (`EventManager.tsx`, tabs), new event, scanner page, race demo |
-| `components/Scanner.tsx` | Camera scanner, debounce, full-screen green/red result with attendee details, verify-only toggle, paste fallback, self-hosted decoder |
-| `components/EventForm.tsx`, `QuestionBuilder.tsx` | Create/edit event, with locked-question hints |
-| `components/RegistrationsPanel.tsx`, `StaffPanel.tsx`, `AuditPanel.tsx` | Registrations (keyset "load more"), volunteers, activity |
-| `app/admin/page.tsx`, `components/AdminPortal.tsx`, `AdminEvents.tsx`, `AdminUsers.tsx` | Admin overview, all events, user list and role changes |
-| `components/Markdown.tsx` | Safe Markdown rendering |
+| `components/organizer/Scanner.tsx` | Camera scanner, debounce, full-screen green/red result with attendee details, verify-only toggle, paste fallback, self-hosted decoder |
+| `components/organizer/EventForm.tsx`, `QuestionBuilder.tsx` | Create/edit event, with locked-question hints |
+| `components/organizer/RegistrationsPanel.tsx`, `StaffPanel.tsx`, `AuditPanel.tsx` | Registrations (keyset "load more"), volunteers, activity |
+| `app/(site)/admin/page.tsx`, `components/admin/AdminPortal.tsx`, `AdminEvents.tsx`, `AdminUsers.tsx` | Admin overview, all events, user list and role changes |
+| `components/ui/Markdown.tsx` | Safe Markdown rendering |
 | `next.config.ts` | The `/api/*` rewrite |
 
 ---

@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { serverFetch } from '@/lib/server';
-import RaceDemo from '@/components/RaceDemo';
-import ChaosLab from '@/components/ChaosLab';
+import RaceDemo from '@/components/organizer/RaceDemo';
+import ChaosLab from '@/components/organizer/ChaosLab';
 
 export const metadata = { title: 'Race demo' };
 

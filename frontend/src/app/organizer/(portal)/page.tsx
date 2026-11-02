@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { getOrganizer, serverFetch } from '@/lib/server';
 import type { OrganizerEvent } from '@/lib/types';
 import { fmtDateTime } from '@/lib/format';
-import Icon from '@/components/Icon';
+import Icon from '@/components/ui/Icon';
 
 export const metadata = { title: 'My events' };
 

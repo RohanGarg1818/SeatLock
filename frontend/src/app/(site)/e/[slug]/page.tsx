@@ -4,12 +4,12 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { publicFetch } from '@/lib/server';
 import type { MyBooking, PublicEvent } from '@/lib/types';
-import EventCover from '@/components/EventCover';
-import Markdown from '@/components/Markdown';
-import RegisterPanel from '@/components/RegisterPanel';
-import ShareBar from '@/components/ShareBar';
-import Icon from '@/components/Icon';
-import { StateTag } from '@/components/StateTag';
+import EventCover from '@/components/events/EventCover';
+import Markdown from '@/components/ui/Markdown';
+import RegisterPanel from '@/components/events/RegisterPanel';
+import ShareBar from '@/components/ui/ShareBar';
+import Icon from '@/components/ui/Icon';
+import { StateTag } from '@/components/ui/StateTag';
 import { fmtDate, fmtTime, modeLabel } from '@/lib/format';
 
 // React cache(): generateMetadata and the page both need the event, but it is fetched once per request.
@@ -41,7 +41,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const jsonLd = {
     '@context': 'https://schema.org', '@type': 'Event', name: e.title, startDate: e.starts_at, endDate: e.ends_at,
     eventStatus: e.status === 'CANCELLED' ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
-    location: { '@type': 'Place', name: e.venue }, description: e.tagline || undefined,
+    location: { '@type': 'Place', name: e.venue }, ...(e.host && { organizer: { '@type': 'Organization', name: e.host } }), description: e.tagline || undefined,
   };
 
   const sameDay = fmtDate(e.ends_at) === fmtDate(e.starts_at);
@@ -60,7 +60,8 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       <div className="mt-10 grid gap-x-10 gap-y-10 pb-24 lg:grid-cols-[1fr_24rem] lg:pb-0">
         <div className="min-w-0 lg:col-start-1">
           <div className="flex flex-wrap items-center gap-2"><StateTag state={e.registration_state} /><span className="tag">{modeLabel[e.mode]}</span></div>
-          <h1 className="display mt-4 text-4xl sm:text-6xl">{e.title}</h1>
+          {e.host && <p className="mt-5 text-lg font-semibold text-muted">{e.host}</p>}
+          <h1 className="display mt-1 text-4xl sm:text-6xl">{e.title}</h1>
           {e.tagline && <p className="mt-4 text-xl text-muted">{e.tagline}</p>}
 
           <dl className="mt-8 grid gap-3 sm:grid-cols-3">

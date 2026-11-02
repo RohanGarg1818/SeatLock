@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { Logo } from '@/components/Icon';
-import ThemeToggle from '@/components/ThemeToggle';
+import { Logo } from '@/components/ui/Icon';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 // Login and sign-up for the organizer portal: a bare page, no navigation, so it can never be mistaken for the attendee site.
 export default function OrgAuthLayout({ children }: { children: React.ReactNode }) {

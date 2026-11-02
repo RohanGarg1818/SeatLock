@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { serverFetch, getUser } from '@/lib/server';
 import type { Booking } from '@/lib/types';
 import { fmtDateTime } from '@/lib/format';
-import CancelBooking from '@/components/BookingActions';
+import CancelBooking from '@/components/events/BookingActions';
 
 export const metadata = { title: 'My tickets' };
 

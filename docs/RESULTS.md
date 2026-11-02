@@ -70,7 +70,7 @@ The API is started as a separate child process with `NODE_ENV=production`, the b
 different pre-created user (JWT minted by the script) with a unique `Idempotency-Key`, so each request includes the
 authentication lookup. Latencies are measured per response by autocannon and the percentiles are computed from every
 sample. The whole script was run twice back to back **after the waitlist was added** (runs 3 and 4 below). The first two runs, made
-before the waitlist existed, are kept as `docs/loadtest-run1.json` / `loadtest-run2.json` for comparison; nothing was discarded.
+before the waitlist existed, are kept as `docs/loadtests/run1.json` / `run2.json` for comparison; nothing was discarded.
 The waitlist adds one cheap `DELETE FROM waitlist WHERE event_id AND user_id` inside each successful hold.
 
 Scenarios: **rush** = 500 seats, 20,000 distinct users (sold out after the first 500 successes, then almost every request
@@ -94,7 +94,7 @@ anything measurable, and no claim that it cost nothing.
 
 Zero connection errors and zero timeouts in all sixteen runs. After every run the invariant query was executed against the
 database (`active bookings <= capacity` and `seats_left == capacity - active`) and held. Raw output:
-`docs/loadtest-run1.json` to `loadtest-run4.json`.
+`docs/loadtests/run1.json` to `run4.json`.
 
 ### How to read these numbers (honest interpretation)
 

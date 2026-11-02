@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { getUser, serverFetch } from '@/lib/server';
 import type { StaffEvent } from '@/lib/types';
 import { fmtDateTime } from '@/lib/format';
-import Icon from '@/components/Icon';
+import Icon from '@/components/ui/Icon';
 
 export const metadata = { title: 'Gate scanner' };
 

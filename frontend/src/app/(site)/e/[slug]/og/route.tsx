@@ -11,14 +11,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
   const title = e?.title ?? 'SeatLock';
   return new ImageResponse(
     (
-      <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: '#17140f', color: '#f5f1e8', padding: 64 }}>
+      <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: '#2b2622', color: '#f6f2f0', padding: 64 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24 }}>
-          <div style={{ fontSize: 220, lineHeight: 0.85, color: '#ff7a4d', fontWeight: 700 }}>{e ? dayNum(e.starts_at) : ''}</div>
+          <div style={{ fontSize: 220, lineHeight: 0.85, color: '#3fbf7f', fontWeight: 700 }}>{e ? dayNum(e.starts_at) : ''}</div>
           <div style={{ fontSize: 44, letterSpacing: 6, paddingBottom: 12 }}>{e ? monthShort(e.starts_at) : ''}</div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {e?.host ? <div style={{ fontSize: 34, marginBottom: 16, color: '#b9afaa' }}>{e.host}</div> : null}
           <div style={{ fontSize: title.length > 40 ? 64 : 84, fontWeight: 700, lineHeight: 1.05 }}>{title}</div>
-          <div style={{ fontSize: 34, marginTop: 24, color: '#aaa292' }}>{e ? `${fmtDate(e.starts_at)}, ${fmtTime(e.starts_at)} · ${e.venue}` : ''}</div>
+          <div style={{ fontSize: 34, marginTop: 24, color: '#b9afaa' }}>{e ? `${fmtDate(e.starts_at)}, ${fmtTime(e.starts_at)} · ${e.venue}` : ''}</div>
         </div>
       </div>
     ),

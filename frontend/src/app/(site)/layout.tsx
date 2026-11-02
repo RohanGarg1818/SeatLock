@@ -1,5 +1,5 @@
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 
 // The attendee website: public events, tickets, the volunteer scanner and the admin area.
 // (Organizers have their own portal under /organizer with its own layout.)

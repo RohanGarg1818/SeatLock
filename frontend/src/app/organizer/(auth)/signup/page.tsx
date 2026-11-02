@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { getOrganizer } from '@/lib/server';
-import OrgAuthForm from '@/components/OrgAuthForm';
+import OrgAuthForm from '@/components/auth/OrgAuthForm';
 
 export const metadata = { title: 'Organizer sign up' };
 export default async function Page() {

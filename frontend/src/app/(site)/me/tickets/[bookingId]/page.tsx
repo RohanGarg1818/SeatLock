@@ -3,7 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getUser, serverFetch } from '@/lib/server';
 import type { Booking } from '@/lib/types';
 import { fmtDate, fmtTime } from '@/lib/format';
-import QrTicket from '@/components/QrTicket';
+import QrTicket from '@/components/events/QrTicket';
 
 export const metadata = { title: 'Your ticket' };
 

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import SlowServerNotice from '@/components/SlowServerNotice';
+import SlowServerNotice from '@/components/ui/SlowServerNotice';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 

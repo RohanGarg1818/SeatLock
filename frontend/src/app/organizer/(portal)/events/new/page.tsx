@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import EventForm from '@/components/EventForm';
+import EventForm from '@/components/organizer/EventForm';
 
 export const metadata = { title: 'New event' };
 

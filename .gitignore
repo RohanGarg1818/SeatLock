@@ -10,3 +10,11 @@ dump.rdb
 # local-only folders
 Claude outputs/
 _old_copies_you_can_delete/
+
+# generated or tool-local
+frontend/AGENTS.md
+frontend/tsconfig.tsbuildinfo
+.taste-skill/
+.agents/
+.claude/
+skills-lock.json

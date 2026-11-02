@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getUser, serverFetch } from '@/lib/server';
 import type { AdminStats } from '@/lib/types';
-import AdminPortal from '@/components/AdminPortal';
+import AdminPortal from '@/components/admin/AdminPortal';
 
 export const metadata = { title: 'Admin' };
 
