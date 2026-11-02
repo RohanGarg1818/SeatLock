@@ -1,0 +1,17 @@
+{
+  "name": "seatlock",
+  "private": true,
+  "description": "Two independent apps: backend/ (Express API + Postgres) and frontend/ (Next.js website). This file only holds shortcuts.",
+  "scripts": {
+    "setup": "npm --prefix backend ci && npm --prefix frontend ci && node scripts/setup-env.mjs",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "npm --prefix backend run db:migrate",
+    "db:seed": "npm --prefix backend run db:seed:demo",
+    "dev": "node scripts/dev.mjs",
+    "backend": "npm --prefix backend run dev",
+    "frontend": "npm --prefix frontend run dev",
+    "test": "npm --prefix backend test",
+    "build": "npm --prefix frontend run build"
+  }
+}

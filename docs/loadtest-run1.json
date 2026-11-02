@@ -1,0 +1,112 @@
+{
+  "generated_at": "2026-10-25T20:52:55.667Z",
+  "machine": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz x2",
+    "memory_mb": 8028,
+    "os": "Linux 6.18.44-fc-v153 x64",
+    "node": "v22.23.4",
+    "postgres": "16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+    "redis": "7.0.15",
+    "db_pool_max": 20
+  },
+  "results": [
+    {
+      "scenario": "rush (500 seats, 20k distinct users)",
+      "mode": "postgres-only",
+      "duration_s": 10,
+      "connections": 64,
+      "total_requests": 6847,
+      "requests_per_sec": 684.7,
+      "latency_ms": {
+        "p50": 83.451235,
+        "p95": 158.122836,
+        "p99": 271.310009,
+        "max": 500.913022
+      },
+      "response_codes": {
+        "201": 500,
+        "409": 6347
+      },
+      "non_2xx_autocannon": 6347,
+      "errors": 0,
+      "timeouts": 0,
+      "bookings_active": 500,
+      "capacity": 500,
+      "seats_left": 0,
+      "invariant_held": true
+    },
+    {
+      "scenario": "rush (500 seats, 20k distinct users)",
+      "mode": "redis-enabled",
+      "duration_s": 10,
+      "connections": 64,
+      "total_requests": 12081,
+      "requests_per_sec": 1208.1,
+      "latency_ms": {
+        "p50": 43.766172,
+        "p95": 86.344509,
+        "p99": 276.384859,
+        "max": 701.393127
+      },
+      "response_codes": {
+        "201": 500,
+        "409": 11581
+      },
+      "non_2xx_autocannon": 11581,
+      "errors": 0,
+      "timeouts": 0,
+      "bookings_active": 500,
+      "capacity": 500,
+      "seats_left": 0,
+      "invariant_held": true
+    },
+    {
+      "scenario": "open (100k seats, 40k distinct users)",
+      "mode": "postgres-only",
+      "duration_s": 10,
+      "connections": 64,
+      "total_requests": 3958,
+      "requests_per_sec": 395.8,
+      "latency_ms": {
+        "p50": 144.55111,
+        "p95": 276.278612,
+        "p99": 387.062996,
+        "max": 574.714661
+      },
+      "response_codes": {
+        "201": 3958
+      },
+      "non_2xx_autocannon": 0,
+      "errors": 0,
+      "timeouts": 0,
+      "bookings_active": 3960,
+      "capacity": 100000,
+      "seats_left": 96040,
+      "invariant_held": true
+    },
+    {
+      "scenario": "open (100k seats, 40k distinct users)",
+      "mode": "redis-enabled",
+      "duration_s": 10,
+      "connections": 64,
+      "total_requests": 3664,
+      "requests_per_sec": 366.4,
+      "latency_ms": {
+        "p50": 159.255478,
+        "p95": 285.369514,
+        "p99": 383.206524,
+        "max": 611.633852
+      },
+      "response_codes": {
+        "201": 3664
+      },
+      "non_2xx_autocannon": 0,
+      "errors": 0,
+      "timeouts": 0,
+      "bookings_active": 3665,
+      "capacity": 100000,
+      "seats_left": 96335,
+      "invariant_held": true
+    }
+  ]
+}

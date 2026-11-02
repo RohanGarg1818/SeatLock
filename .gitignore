@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.env
+.env.local
+*.log
+coverage/
+dump.rdb
+.DS_Store
+
+# local-only folders
+Claude outputs/
+_old_copies_you_can_delete/
