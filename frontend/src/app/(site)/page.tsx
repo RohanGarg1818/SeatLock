@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { serverFetch } from '@/lib/server';
+import { publicFetch } from '@/lib/server';
 import type { PublicEvent } from '@/lib/types';
 import EventExplorer from '@/components/EventExplorer';
 import TicketHero from '@/components/TicketHero';
+import Ticker from '@/components/Ticker';
 import Faq from '@/components/Faq';
 import { HoldTimer, Queue, SeatPlan, TicketArt } from '@/components/Pictures';
 
@@ -20,18 +21,22 @@ const SLIP: { when: string; rows: [string, string][] }[] = [
 ];
 
 export default async function Home() {
-  const { status, data } = await serverFetch<{ events: PublicEvent[] }>('/public/events');
+  const { status, data } = await publicFetch<{ events: PublicEvent[] }>('/public/events', 20);
   const events = data?.events ?? [];
   const ok = status === 200;
   const soonest = events.filter((e) => e.registration_state === 'OPEN').sort((a, b) => a.starts_at.localeCompare(b.starts_at))[0] ?? null;
 
+  const openEvents = events.filter((e) => e.registration_state === 'OPEN');
+  const seatsFree = openEvents.reduce((n, e) => n + e.seats_left, 0);
+
   return (
     <>
-      <TicketHero event={soonest} />
+      <TicketHero event={soonest} open={openEvents.length} seats={seatsFree} />
+      <Ticker events={events} />
 
       {/* events */}
-      <section id="events" className="scroll-mt-24 pt-24 sm:pt-32" aria-labelledby="events-h">
-        <h2 id="events-h" className="display reveal text-6xl sm:text-8xl">Upcoming events</h2>
+      <section id="events" className="scroll-mt-24 pt-16 sm:pt-20" aria-labelledby="events-h">
+        <h2 id="events-h" className="display reveal text-5xl sm:text-6xl">Upcoming events</h2>
         <p className="reveal mt-4 max-w-[60ch] text-lg">Pick one, hold your seat, and you are done. Seat counts update live.</p>
         <div className="mt-10">
           {!ok && (
@@ -55,16 +60,16 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* features: sheets that slide over each other */}
-      <section className="pt-24 sm:pt-32" aria-labelledby="feat-h">
-        <h2 id="feat-h" className="display reveal text-5xl sm:text-7xl">What keeps it fair</h2>
-        <div className="mt-12">
-          {SHEETS.map((s, i) => (
-            <article key={s.name} className={`sheet ${s.bg} px-6 pb-10 pt-4 sm:px-10`} style={{ ['--i' as string]: i }}>
-              <h3 className="display truncate text-2xl sm:text-4xl">{s.name}</h3>
-              <div className="reveal grid items-end gap-8 md:grid-cols-[1fr_1.2fr]">
-                <p className="max-w-[45ch] text-lg">{s.text}</p>
-                <div className="flex justify-center md:justify-end">{s.art}</div>
+      {/* features: four colour panels, side by side */}
+      <section id="features" className="scroll-mt-24 pt-20 sm:pt-28" aria-labelledby="feat-h">
+        <h2 id="feat-h" className="display reveal text-5xl sm:text-6xl">What keeps it fair</h2>
+        <div className="mt-10 grid gap-4 sm:grid-cols-2">
+          {SHEETS.map((s) => (
+            <article key={s.name} className={`reveal flex flex-col justify-between gap-6 rounded-[4px] p-6 sm:p-8 ${s.bg}`}>
+              <div className="flex h-44 items-center justify-center [&>svg]:!h-full [&>svg]:!w-auto [&>svg]:!max-w-full">{s.art}</div>
+              <div>
+                <h3 className="display text-3xl">{s.name}</h3>
+                <p className="mt-2 max-w-[46ch] text-lg">{s.text}</p>
               </div>
             </article>
           ))}
@@ -72,10 +77,10 @@ export default async function Home() {
       </section>
 
       {/* how it works: an itinerary on a slip */}
-      <section id="how" className="scroll-mt-24 pt-24 sm:pt-32" aria-labelledby="how-h">
+      <section id="how" className="scroll-mt-24 pt-20 sm:pt-28" aria-labelledby="how-h">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_30rem] lg:gap-20">
           <div>
-            <h2 id="how-h" className="display reveal text-5xl sm:text-7xl">From click to front row</h2>
+            <h2 id="how-h" className="display reveal text-5xl sm:text-6xl">From click to front row</h2>
             <p className="reveal mt-5 max-w-[34ch] text-lg">The whole journey takes about eight minutes, and most of it is you reading the registration form.</p>
           </div>
           <div className="slip reveal px-6 pt-6">
@@ -96,9 +101,9 @@ export default async function Home() {
 
       {/* organizers: the reply card */}
       <section className="bleed mt-24 overflow-hidden bg-[#2b2622] sm:mt-32" aria-labelledby="org-h">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-0 pt-16 sm:px-6 sm:pt-20 lg:grid-cols-[1fr_1.2fr]">
-          <p className="reveal max-w-[34ch] self-end pb-16 text-xl text-[#f6f2f0]">Publish an event in a few minutes, share one link, and watch the seats fill. Holds, the waitlist, tickets and check-in are handled for you.</p>
-          <div className="reveal -mb-14 rotate-[-2deg] bg-[#f6f2f0] p-8 text-center text-[#2b2622] sm:p-12">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-16 sm:px-6 sm:pt-20 lg:grid-cols-[1fr_1.2fr]">
+          <p className="reveal max-w-[34ch] self-center text-xl text-[#f6f2f0]">Publish an event in a few minutes, share one link, and watch the seats fill. Holds, the waitlist, tickets and check-in are handled for you.</p>
+          <div className="reveal rotate-[-2deg] bg-[#f6f2f0] p-8 text-center text-[#2b2622] sm:p-12">
             <h2 id="org-h" className="display text-3xl sm:text-4xl">Run your society&apos;s next event</h2>
             <p className="mx-auto mt-3 max-w-xs text-[1.05rem]">Free to start. Your own login and your own dashboard.</p>
             <Link href="/organizer/signup" className="btn btn-primary btn-lg mt-6 w-full">Open the organizer portal</Link>
@@ -109,8 +114,8 @@ export default async function Home() {
       </section>
 
       {/* faq */}
-      <section id="faq" className="scroll-mt-24 pt-32 sm:pt-40" aria-labelledby="faq-h">
-        <h2 id="faq-h" className="display reveal mb-10 text-5xl sm:text-7xl">Good to know</h2>
+      <section id="faq" className="scroll-mt-24 pt-24 sm:pt-32" aria-labelledby="faq-h">
+        <h2 id="faq-h" className="display reveal mb-10 text-5xl sm:text-6xl">Good to know</h2>
         <Faq />
       </section>
     </>

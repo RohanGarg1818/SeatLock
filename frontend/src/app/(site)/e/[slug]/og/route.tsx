@@ -1,12 +1,12 @@
 import { ImageResponse } from 'next/og';
-import { serverFetch } from '@/lib/server';
+import { publicFetch } from '@/lib/server';
 import type { PublicEvent } from '@/lib/types';
 import { fmtDate, fmtTime, dayNum, monthShort } from '@/lib/format';
 
 // Typographic share card (1200x630) for events without a banner image. Generated on demand for link previews.
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { data } = await serverFetch<{ event: PublicEvent }>(`/public/events/${encodeURIComponent(slug)}`);
+  const { data } = await publicFetch<{ event: PublicEvent }>(`/public/events/${encodeURIComponent(slug)}`, 60);
   const e = data?.event;
   const title = e?.title ?? 'SeatLock';
   return new ImageResponse(

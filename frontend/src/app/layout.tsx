@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: [{ media: '(prefers-color-scheme: light)', color: '#ebe5e3' }, { media: '(prefers-color-scheme: dark)', color: '#1c1816' }] };
 
 // Runs before first paint so a saved dark/light choice never flashes the wrong theme.
-const themeInit = `try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}`;
+const themeInit = `try{var l=document.querySelector('link[data-late]');if(l){l.onload=function(){l.media='all'};if(l.sheet)l.media='all'}var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,7 +20,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://api.fontshare.com" />
         <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
-        <link href="https://api.fontshare.com/v2/css?f[]=erode@400,401,500,600&display=swap" rel="stylesheet" />
+        {/* Loaded without blocking the first paint: the page shows in a system serif at once and switches to Erode when it arrives. */}
+        <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=erode@400,401,500,600&display=swap" media="print" data-late />
+        <noscript><link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=erode@400,401,500,600&display=swap" /></noscript>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body>

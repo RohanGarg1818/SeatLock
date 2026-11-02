@@ -5,8 +5,7 @@ import { usePathname } from 'next/navigation';
 import Icon from './Icon';
 import ThemeToggle from './ThemeToggle';
 import LogoutButton from './LogoutButton';
-
-interface Props { user: { name: string; role: string } | null; volunteers?: boolean }
+import { useSession } from '@/lib/session';
 
 const PUBLIC_LINKS = [
   { href: '/#events', label: 'Events' },
@@ -15,7 +14,8 @@ const PUBLIC_LINKS = [
   { href: '/#faq', label: 'FAQ' },
 ];
 
-export default function NavMenu({ user, volunteers = false }: Props) {
+export default function NavMenu() {
+  const { user, volunteers } = useSession();
   const [open, setOpen] = useState(false);
   const path = usePathname();
   useEffect(() => { setOpen(false); }, [path]);

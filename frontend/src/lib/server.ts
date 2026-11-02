@@ -37,3 +37,18 @@ export const getOrganizer = cache(async (): Promise<User | null> => {
   const { status, data } = await serverFetch<{ user: User }>('/organizer/auth/me');
   return status === 200 && data ? data.user : null;
 });
+
+/**
+ * For PUBLIC pages (home, event pages). It sends no cookie, so Next.js can build the page once and serve it from
+ * cache, refreshing it in the background every `seconds`. Anything personal (my ticket, am I logged in) is
+ * loaded in the browser instead. This is what makes those pages open instantly, even when the API is asleep.
+ */
+export async function publicFetch<T = unknown>(path: string, seconds = 20): Promise<{ status: number; data: T | null }> {
+  try {
+    const res = await fetch(API_URL + path, { next: { revalidate: seconds }, signal: AbortSignal.timeout(60_000) });
+    const data = res.headers.get('content-type')?.includes('json') ? ((await res.json()) as T) : null;
+    return { status: res.status, data };
+  } catch {
+    return { status: 503, data: null };
+  }
+}

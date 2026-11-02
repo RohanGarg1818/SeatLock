@@ -161,3 +161,9 @@ textarea.field { min-height: 6rem; }
 .sheet { position: sticky; top: calc(4rem + var(--i) * 3.5rem); border-radius: 28px 28px 0 0; min-height: 70svh; }
 .sheet > h3 { height: 2.5rem; line-height: 2.5rem; margin-bottom: 1.75rem; }
 @media (max-width: 640px) { .ticket { --stub: 4.25rem; } .sheet { top: calc(4rem + var(--i) * 3rem); border-radius: 20px 20px 0 0; } }
+
+/* Departures strip on the home page. */
+@keyframes marquee { to { transform: translateX(-50%); } }
+.marquee { animation: marquee 45s linear infinite; }
+.marquee:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .marquee { animation: none; } }

@@ -2,7 +2,7 @@ import { cache } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { serverFetch, getUser } from '@/lib/server';
+import { publicFetch } from '@/lib/server';
 import type { MyBooking, PublicEvent } from '@/lib/types';
 import EventCover from '@/components/EventCover';
 import Markdown from '@/components/Markdown';
@@ -13,7 +13,7 @@ import { StateTag } from '@/components/StateTag';
 import { fmtDate, fmtTime, modeLabel } from '@/lib/format';
 
 // React cache(): generateMetadata and the page both need the event, but it is fetched once per request.
-const load = cache(async (slug: string) => serverFetch<{ event: PublicEvent; my_booking: MyBooking | null; my_waitlist: { position: number } | null }>(`/public/events/${encodeURIComponent(slug)}`));
+const load = cache(async (slug: string) => publicFetch<{ event: PublicEvent; my_booking: MyBooking | null; my_waitlist: { position: number } | null }>(`/public/events/${encodeURIComponent(slug)}`, 10));
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [{ status, data }, user] = await Promise.all([load(slug), getUser()]);
+  const { status, data } = await load(slug);
   if (status === 404 || (status === 200 && !data)) notFound();
   if (status !== 200 || !data) return <p role="alert" className="card p-4">We could not load this event. Please refresh in a moment.</p>;
   const { event: e, my_booking, my_waitlist } = data;
@@ -73,7 +73,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         </div>
 
         <aside id="register" className="scroll-mt-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:sticky lg:top-24 lg:self-start">
-          <RegisterPanel event={e} initialMyBooking={my_booking} initialWaitlist={my_waitlist} loggedIn={!!user} />
+          <RegisterPanel event={e} initialMyBooking={my_booking} initialWaitlist={my_waitlist} />
         </aside>
 
         <div className="min-w-0 lg:col-start-1">

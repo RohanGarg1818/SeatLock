@@ -6,6 +6,7 @@ import { api, ApiError } from '@/lib/client';
 import { fmtDateTime } from '@/lib/format';
 import type { Booking, MyBooking, MyWaitlist, PublicEvent, RegState } from '@/lib/types';
 import QuestionField from './QuestionField';
+import { useSession } from '@/lib/session';
 
 type Phase = 'idle' | 'holding' | 'form' | 'confirming' | 'done' | 'expired';
 interface Live { seats_left: number; registration_state: RegState; my_booking: MyBooking | null; my_waitlist: MyWaitlist | null; waitlist_count: number }
@@ -20,7 +21,8 @@ function fmtCountdown(totalSeconds: number) {
   return `${m}m ${String(s % 60).padStart(2, '0')}s`;
 }
 
-export default function RegisterPanel({ event, initialMyBooking, initialWaitlist = null, loggedIn }: { event: PublicEvent; initialMyBooking: MyBooking | null; initialWaitlist?: MyWaitlist | null; loggedIn: boolean }) {
+export default function RegisterPanel({ event, initialMyBooking, initialWaitlist = null }: { event: PublicEvent; initialMyBooking: MyBooking | null; initialWaitlist?: MyWaitlist | null }) {
+  const loggedIn = !!useSession().user;
   const router = useRouter();
   const questions = event.registration_questions ?? [];
 
@@ -36,6 +38,7 @@ export default function RegisterPanel({ event, initialMyBooking, initialWaitlist
     } catch { /* keep showing the last known numbers */ }
   }, [event.slug]);
   useEffect(() => {
+    poll(); // the cached page has no 'my ticket' in it: fetch it right away
     const id = setInterval(() => { if (!document.hidden) poll(); }, POLL_MS);
     const onVisible = () => { if (!document.hidden) poll(); };
     document.addEventListener('visibilitychange', onVisible);

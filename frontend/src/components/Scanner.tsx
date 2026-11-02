@@ -38,6 +38,8 @@ export default function Scanner({ eventId, eventTitle }: { eventId: string; even
   const verifyRef = useRef(false);
   useEffect(() => { verifyRef.current = verifyOnly; }, [verifyOnly]);
   const [camError, setCamError] = useState<string | null>(null);
+  const [cameraOn, setCameraOn] = useState(false); // the camera starts only when the volunteer taps the button
+  const [recent, setRecent] = useState<{ name: string; at: Date }[]>([]);
   const busy = useRef(false);
   const last = useRef<{ token: string; at: number }>({ token: '', at: 0 });
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -58,6 +60,7 @@ export default function Scanner({ eventId, eventTitle }: { eventId: string; even
         setOutcome({ ok: true, title: 'Valid ticket', detail: r.attendee, email: r.email, details: r.details, verifyToken: t });
       } else {
         setCount((c) => c + 1);
+        setRecent((l) => [{ name: r.attendee, at: new Date() }, ...l].slice(0, 8));
         setOutcome({ ok: true, title: 'Checked in', detail: r.attendee, email: r.email, details: r.details });
         timer.current = setTimeout(() => setOutcome(null), 4000);
       }
@@ -74,17 +77,28 @@ export default function Scanner({ eventId, eventTitle }: { eventId: string; even
     <div>
       <p className="text-muted">{eventTitle} · <strong className="text-fg">{count}</strong> checked in on this device</p>
 
-      <div className="mt-4 max-w-md overflow-hidden border-2 border-fg" aria-label="Camera viewfinder">
-        {camError ? <p className="p-6" role="alert">{camError} Use the box below to paste a ticket code instead.</p> : (
-          <QrScanner
-            onScan={(codes) => { const v = codes[0]?.rawValue; if (v) submit(v); }}
-            onError={(e) => setCamError(e instanceof Error && e.name === 'NotAllowedError' ? 'Camera permission was denied.' : 'The camera is not available.')}
-            constraints={{ facingMode: 'environment' }}
-            scanDelay={300}
-            paused={!!outcome}
-          />
-        )}
-      </div>
+      {!cameraOn ? (
+        <div className="mt-4 max-w-md rounded-[4px] bg-surface-2 p-6">
+          <p className="display text-2xl">Scan attendee tickets</p>
+          <p className="mt-2 text-muted">Open the camera and point it at the QR code on the attendee&apos;s phone or printout. A valid ticket is marked present on the registration sheet at once.</p>
+          <button type="button" className="btn btn-primary btn-lg mt-5 w-full" onClick={() => { setCamError(null); setCameraOn(true); }}>Open camera</button>
+        </div>
+      ) : (
+        <div className="mt-4 max-w-md">
+          <div className="overflow-hidden border-2 border-fg" aria-label="Camera viewfinder">
+            {camError ? <p className="p-6" role="alert">{camError} Use the box below to paste a ticket code instead.</p> : (
+              <QrScanner
+                onScan={(codes) => { const v = codes[0]?.rawValue; if (v) submit(v); }}
+                onError={(e) => setCamError(e instanceof Error && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow the camera for this site in your browser settings, then try again.' : 'The camera is not available.')}
+                constraints={{ facingMode: 'environment' }}
+                scanDelay={300}
+                paused={!!outcome}
+              />
+            )}
+          </div>
+          <button type="button" className="btn btn-sm mt-3" onClick={() => setCameraOn(false)}>Close camera</button>
+        </div>
+      )}
 
       <label className="mt-4 flex max-w-md items-start gap-3">
         <input type="checkbox" className="mt-1 h-5 w-5 accent-[var(--accent)]" checked={verifyOnly} onChange={(e) => setVerifyOnly(e.target.checked)} />
@@ -95,6 +109,15 @@ export default function Scanner({ eventId, eventTitle }: { eventId: string; even
         <label className="label" htmlFor="tok">Camera not working? Paste the ticket code</label>
         <div className="flex gap-2"><input id="tok" className="field font-mono text-sm" value={token} onChange={(e) => setToken(e.target.value)} autoComplete="off" /><button className="btn btn-primary">Check in</button></div>
       </form>
+
+      {recent.length > 0 && (
+        <section className="mt-8 max-w-md" aria-label="Marked present on this device">
+          <h2 className="display text-2xl">Marked present</h2>
+          <ul className="mt-3 divide-y divide-[var(--line)]">
+            {recent.map((r, i) => <li key={i} className="flex justify-between gap-4 py-2"><span className="font-medium">{r.name}</span><span className="num text-muted">{r.at.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span></li>)}
+          </ul>
+        </section>
+      )}
 
       {/* Full-screen result. Colour AND a glyph AND words: it must be readable in sunlight and by colour-blind volunteers. */}
       {outcome && (
