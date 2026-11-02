@@ -10,7 +10,7 @@ import { labelAnswers } from '../questions.js';
 
 const schema = z.object({ token: z.string().min(1).max(500), event_id: z.string().regex(/^\d+$/).optional(), preview: z.boolean().optional() });
 
-export default function checkinRouter(ctx, { requireAuth }) {
+export default function checkinRouter(ctx, { requireEither }) {
   const r = Router();
   const { pool, config } = ctx;
   // Gate scanners work fast, so this limit is much higher than the registration ones.
@@ -19,7 +19,7 @@ export default function checkinRouter(ctx, { requireAuth }) {
   // POST /checkin { token, event_id?, preview? } — organizer, admin, or a volunteer of THIS event.
   // preview:true only LOOKS (who is this, is the ticket valid) and changes nothing, so a volunteer can verify a ticket
   // before letting the person in, or double-check someone without using up their one check-in.
-  r.post('/checkin', requireAuth, limit, async (req, res) => {
+  r.post('/checkin', requireEither, limit, async (req, res) => {
     const { token, event_id, preview } = parse(schema, req.body);
 
     // 1. Signature first: a forged or edited ticket is rejected before any database work.

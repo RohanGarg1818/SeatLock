@@ -36,7 +36,8 @@ test('admin events list shows every organizer, with organizer name, counts and k
   assert.equal(stats.organizer_name, 'Olga Org'); assert.equal(stats.confirmed_count, 1); assert.equal(stats.waitlist_count, 1);
   assert.ok(all.every((e) => e.slug !== 'demo-x'));
   for (const path of ['/admin/stats', '/admin/events']) {
-    assert.equal((await app.call('GET', path, { token: organizer.token })).status, 403);
+    // an organizer-portal session is simply not a login on the website, so the admin API sees nobody
+    assert.equal((await app.call('GET', path, { token: organizer.token })).status, 401);
     assert.equal((await app.call('GET', path)).status, 401);
   }
 });

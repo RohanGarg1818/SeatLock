@@ -6,7 +6,6 @@ import QueryStream from 'pg-query-stream';
 import { z } from 'zod';
 import { AppError } from '../errors.js';
 import { parse, idParam, limitParam, likePattern, emailSchema } from '../util.js';
-import { requireRole } from '../middleware/auth.js';
 import { getOwnedEvent } from '../ownership.js';
 import { tx } from '../db.js';
 import { audit } from '../audit.js';
@@ -24,10 +23,10 @@ export function csvCell(value) {
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-export default function eventOpsRouter(ctx, { requireAuth }) {
+export default function eventOpsRouter(ctx, { requireAuth, requireOrganizer }) {
   const r = Router();
   const { pool } = ctx;
-  const organizerOnly = [requireAuth, requireRole('organizer', 'admin')];
+  const organizerOnly = [requireOrganizer]; // organizer portal session only
 
   // Re-derive the seat numbers from the bookings and compare (read-only; see services/integrity.js).
   r.get('/events/:id/integrity', ...organizerOnly, async (req, res) => {

@@ -67,6 +67,9 @@ export async function createUser(app, { name, email, role = 'participant' } = {}
   return { ...user, token: signToken(app.config, user) };
 }
 
+// A token for the ORGANIZER PORTAL session (what /organizer/auth/login hands out), e.g. for an admin acting as an organizer.
+export const portalToken = (app, user) => signToken(app.config, user, 'organizer');
+
 export async function createManyUsers(app, count, prefix = 'bulk') {
   const { rows } = await app.pool.query(
     `INSERT INTO users (name, email, password_hash)

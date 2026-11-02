@@ -3,13 +3,13 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { AppError } from '../errors.js';
 import { parse, idParam } from '../util.js';
-import { requireRole } from '../middleware/auth.js';
+
 import { runRace } from '../services/raceDemo.js';
 import { runChaos } from '../services/chaos.js';
 import { audit } from '../audit.js';
 import { tx } from '../db.js';
 
-export default function demoRouter(ctx, { requireAuth }) {
+export default function demoRouter(ctx, { requireAuth, requireOrganizer }) {
   const r = Router();
   const { pool } = ctx;
 
@@ -48,7 +48,7 @@ export default function demoRouter(ctx, { requireAuth }) {
     requests: z.number().int().min(1).max(1000),
   });
 
-  r.post('/demo/race', requireAuth, requireRole('organizer', 'admin'), async (req, res) => {
+  r.post('/demo/race', requireOrganizer, async (req, res) => {
     const body = parse(raceSchema, req.body);
     const baseUrl = `http://127.0.0.1:${req.socket.localPort}`;
     const result = await runRace(ctx, { ...body, baseUrl, organizerId: req.user.id });
@@ -70,7 +70,7 @@ export default function demoRouter(ctx, { requireAuth }) {
 
   // One experiment at a time: two chaos runs in parallel would fight over the shared Redis switch.
   let chaosRunning = false;
-  r.post('/demo/chaos', requireAuth, requireRole('organizer', 'admin'), async (req, res) => {
+  r.post('/demo/chaos', requireOrganizer, async (req, res) => {
     const body = parse(chaosSchema, req.body);
     if (chaosRunning) throw new AppError(409, 'CHAOS_BUSY', 'Another experiment is still running. Try again in a moment.');
     chaosRunning = true;

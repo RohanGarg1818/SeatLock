@@ -1,6 +1,6 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startTestApp, createUser, createManyUsers, createEvent, hold, checkInvariant } from './helpers.js';
+import { startTestApp, createUser, createManyUsers, createEvent, hold, checkInvariant, portalToken } from './helpers.js';
 import { sweepOnce } from '../src/sweeper.js';
 
 let app, organizer, admin;
@@ -84,12 +84,12 @@ test('role enforcement: participants cannot manage events; admin endpoints are a
   ];
   for (const [m, path, body] of checks) {
     assert.equal((await app.call(m, path, { body })).status, 401, `${m} ${path} anonymous`);
-    assert.equal((await app.call(m, path, { token: p.token, body })).status, 403, `${m} ${path} participant`);
+    assert.equal((await app.call(m, path, { token: p.token, body })).status, 401, `${m} ${path} participant (no organizer-portal session)`);
   }
   for (const [m, path, body] of [['GET', '/admin/users'], ['PATCH', `/admin/users/${p.id}/role`, { role: 'organizer' }]]) {
     assert.equal((await app.call(m, path, { body })).status, 401);
     assert.equal((await app.call(m, path, { token: p.token, body })).status, 403);
-    assert.equal((await app.call(m, path, { token: organizer.token, body })).status, 403, `${m} ${path} organizer`);
+    assert.equal((await app.call(m, path, { token: organizer.token, body })).status, 401, `${m} ${path} organizer (portal session is not a website login)`);
   }
 });
 
@@ -99,8 +99,8 @@ test('ownership: another organizer cannot see or change my event (404); an admin
   assert.equal((await app.call('GET', `/events/${ev.id}`, { token: other.token })).status, 404);
   assert.equal((await app.call('PATCH', `/events/${ev.id}`, { token: other.token, body: { title: 'Hijack' } })).status, 404);
   assert.equal((await app.call('POST', `/events/${ev.id}/publish`, { token: other.token })).status, 404);
-  assert.equal((await app.call('GET', `/events/${ev.id}`, { token: admin.token })).status, 200);
-  assert.equal((await app.call('PATCH', `/events/${ev.id}`, { token: admin.token, body: { title: 'Admin edit' } })).status, 200);
+  assert.equal((await app.call('GET', `/events/${ev.id}`, { token: portalToken(app, admin) })).status, 200);
+  assert.equal((await app.call('PATCH', `/events/${ev.id}`, { token: portalToken(app, admin), body: { title: 'Admin edit' } })).status, 200);
 });
 
 // ---------------------------------------------------------------- events
@@ -429,7 +429,7 @@ test('admin: list/search users with keyset pagination; role change is audited; c
   const up = await app.call('PATCH', `/admin/users/${target.id}/role`, { token: admin.token, body: { role: 'organizer' } });
   assert.equal(up.status, 200); assert.equal(up.body.user.role, 'organizer');
   // role takes effect immediately (the user is re-read from the DB on every request)
-  assert.equal((await app.call('POST', '/events', { token: target.token, body: validEvent() })).status, 201);
+  assert.equal((await app.call('POST', '/events', { token: portalToken(app, up.body.user), body: validEvent() })).status, 201);
   const log = await app.pool.query(`SELECT * FROM audit_log WHERE action = 'user.role_change' AND entity_id = $1`, [target.id]);
   assert.equal(log.rows.length, 1); assert.equal(log.rows[0].details.to, 'organizer'); assert.equal(String(log.rows[0].actor_id), String(admin.id));
   assert.equal((await app.call('PATCH', `/admin/users/${admin.id}/role`, { token: admin.token, body: { role: 'participant' } })).status, 409);

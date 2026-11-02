@@ -3,13 +3,12 @@
 import { Router } from 'express';
 import { createHash } from 'node:crypto';
 import { AppError } from '../errors.js';
-import { requireRole } from '../middleware/auth.js';
 
-export default function uploadsRouter(ctx, { requireAuth }) {
+export default function uploadsRouter(ctx, { requireOrganizer }) {
   const r = Router();
   const { config } = ctx;
 
-  r.post('/uploads/sign', requireAuth, requireRole('organizer', 'admin'), (req, res) => {
+  r.post('/uploads/sign', requireOrganizer, (req, res) => {
     if (!config.cloudinary) throw new AppError(404, 'FEATURE_DISABLED', 'Image uploads are not configured.');
     const { cloudName, apiKey, apiSecret } = config.cloudinary;
     const params = { folder: 'seatlock/banners', timestamp: Math.floor(Date.now() / 1000) };

@@ -50,7 +50,7 @@ test('GET /events/:id/integrity: the owner and admins may run it, others may not
   const ok = await app.call('GET', `/events/${ev.id}/integrity`, { token: organizer.token });
   assert.equal(ok.status, 200); assert.equal(ok.body.integrity.ok, true);
   assert.equal((await app.call('GET', `/events/${ev.id}/integrity`, { token: other.token })).status, 404);
-  assert.equal((await app.call('GET', `/events/${ev.id}/integrity`, { token: student.token })).status, 403);
+  assert.equal((await app.call('GET', `/events/${ev.id}/integrity`, { token: student.token })).status, 401);
   assert.equal((await app.call('GET', `/events/${ev.id}/integrity`)).status, 401);
 });
 
@@ -75,7 +75,7 @@ for (const [name, flags] of scenarios) {
 }
 
 test('POST /demo/chaos: organizers only, input validated, one run at a time', async () => {
-  assert.equal((await app.call('POST', '/demo/chaos', { token: student.token, body: { capacity: 5, users: 10 } })).status, 403);
+  assert.equal((await app.call('POST', '/demo/chaos', { token: student.token, body: { capacity: 5, users: 10 } })).status, 401);
   assert.equal((await app.call('POST', '/demo/chaos', { token: organizer.token, body: { capacity: 0, users: 10 } })).status, 422);
   const [a, b] = await Promise.all([
     app.call('POST', '/demo/chaos', { token: organizer.token, body: { capacity: 5, users: 40, retry_storm: true } }),

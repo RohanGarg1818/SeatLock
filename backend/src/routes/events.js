@@ -5,7 +5,6 @@ import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { AppError } from '../errors.js';
 import { parse, idParam, EVENT_COLS } from '../util.js';
-import { requireRole } from '../middleware/auth.js';
 import { questionsSchema, checkQuestionEditAllowed } from '../questions.js';
 import { tx } from '../db.js';
 import { audit } from '../audit.js';
@@ -69,10 +68,10 @@ function slugify(title) {
   return base || 'event';
 }
 
-export default function eventsRouter(ctx, { requireAuth }) {
+export default function eventsRouter(ctx, { requireOrganizer }) {
   const r = Router();
   const { pool } = ctx;
-  const organizerOnly = [requireAuth, requireRole('organizer', 'admin')];
+  const organizerOnly = [requireOrganizer]; // organizer portal session only
 
   // ---- list / read ------------------------------------------------------------------------
   r.get('/events', ...organizerOnly, async (req, res) => {
