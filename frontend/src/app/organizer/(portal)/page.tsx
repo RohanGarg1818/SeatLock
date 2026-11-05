@@ -3,6 +3,8 @@ import { getOrganizer, serverFetch } from '@/lib/server';
 import type { OrganizerEvent } from '@/lib/types';
 import { fmtDateTime } from '@/lib/format';
 import Icon from '@/components/ui/Icon';
+import Snapshot from '@/components/ui/Snapshot';
+import { kindOf, posterFor } from '@/lib/kind';
 
 export const metadata = { title: 'My events' };
 
@@ -45,9 +47,12 @@ export default async function OrganizerHome() {
         <ul className="mt-4 space-y-3">
           {events.map((e) => (
             <li key={e.id} className="card card-hover flex flex-wrap items-center justify-between gap-3 p-5">
-              <div>
-                <Link href={`/organizer/events/${e.id}`} className="display text-xl underline-offset-4 hover:underline">{e.title}</Link>
-                <p className="text-sm text-muted">{fmtDateTime(e.starts_at)} · {e.venue}</p>
+              <div className="flex min-w-0 items-center gap-4">
+                <span className="hidden w-24 shrink-0 sm:block"><Snapshot src={posterFor(e)} kind={kindOf(e.title)} alt="" className="!rounded-2xl" /></span>
+                <div className="min-w-0">
+                  <Link href={`/organizer/events/${e.id}`} className="display text-xl underline-offset-4 hover:underline">{e.title}</Link>
+                  <p className="text-sm text-muted">{fmtDateTime(e.starts_at)} · {e.venue}</p>
+                </div>
               </div>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                 <span className="tag">{e.status}</span>

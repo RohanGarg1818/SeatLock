@@ -9,7 +9,7 @@ export default function IntegrityReport({ report }: { report: Report }) {
       <p className={`display text-3xl ${report.ok ? 'text-ok' : 'text-bad'}`} data-testid="integrity-verdict">
         {report.ok ? `All ${report.checks.length} checks passed` : `${failed} of ${report.checks.length} checks FAILED`}
       </p>
-      <ul className="mt-4 space-y-1.5 [&>li]:rounded-[4px] [&>li]:bg-surface-2 [&>li]:px-3">
+      <ul className="mt-4 space-y-1.5 [&>li]:rounded-2xl [&>li]:bg-surface-2 [&>li]:px-3">
         {report.checks.map((c) => (
           <li key={c.id} className="grid gap-1 p-3 sm:grid-cols-[2rem_1fr_auto] sm:gap-3">
             <span aria-hidden className={`display text-xl ${c.ok ? 'text-ok' : 'text-bad'}`}>{c.skipped ? '–' : <Icon name={c.ok ? 'check' : 'close'} size={20} />}</span>

@@ -30,23 +30,23 @@ export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
     ? ['Your tickets, always one tap away', 'Continue a seat you are still holding', 'See your place on any waitlist']
     : ['Hold a seat in one click', 'A QR ticket the moment you confirm', 'Automatic waitlist when events fill up'];
   return (
-    <div className="mx-auto grid max-w-5xl overflow-hidden rounded-md border-[1.5px] border-[var(--ink-line)] bg-surface lg:grid-cols-[0.9fr_1fr]">
-      <aside className="relative isolate hidden flex-col justify-between overflow-hidden bg-[#11151a] p-10 text-white lg:flex">
+    <div className="mx-auto grid max-w-5xl overflow-hidden rounded-[36px] border-2 border-ink-line bg-card text-card-fg lg:grid-cols-[0.9fr_1fr]">
+      <aside className="relative isolate hidden flex-col justify-between overflow-hidden border-r-2 border-ink-line bg-[#e9ae70] p-10 text-[#141414] lg:flex">
         <div className="flex items-center gap-2.5"><Logo /><span className="display text-2xl">SeatLock</span></div>
         <div>
           <p className="display text-4xl leading-tight">{isLogin ? 'Good to see you again.' : 'Your seat is one click away.'}</p>
           <ul className="mt-8 space-y-3.5">
-            {perks.map((t) => <li key={t} className="flex items-start gap-3 text-white/90"><span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white/20"><Icon name="check" size={13} /></span>{t}</li>)}
+            {perks.map((t) => <li key={t} className="flex items-start gap-3 text-[#141414]"><span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 border-ink-line bg-white"><Icon name="check" size={13} /></span>{t}</li>)}
           </ul>
         </div>
-        <p className="text-sm text-white/70">Every seat handed out exactly once.</p>
+        <p className="text-sm text-[#141414]/70">Every seat handed out exactly once.</p>
       </aside>
 
       <div className="px-6 py-10 sm:px-12 sm:py-14">
         <h1 className="display text-4xl">{isLogin ? 'Welcome back' : 'Create your account'}</h1>
         <p className="mt-2 text-muted">{isLogin ? 'Log in to see your tickets and register for events.' : 'It is free and takes under a minute.'}</p>
         <form onSubmit={submit} className="mt-8 space-y-5" noValidate>
-          {error && <p role="alert" className="rounded-xl border border-bad bg-bad-bg p-3 text-sm text-bad">{error}</p>}
+          {error && <p role="alert" className="rounded-2xl border-2 border-bad bg-bad-bg p-3 text-sm text-bad">{error}</p>}
           {!isLogin && <Field name="name" label="Full name" autoComplete="name" error={fields.name} />}
           <Field name="email" label="Email" type="email" autoComplete="email" error={fields.email} />
           <Field name="password" label="Password" type="password" autoComplete={isLogin ? 'current-password' : 'new-password'} error={fields.password} hint={isLogin ? undefined : 'At least 8 characters.'} />

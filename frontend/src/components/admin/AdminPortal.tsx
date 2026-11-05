@@ -17,7 +17,7 @@ export default function AdminPortal({ stats, meId }: { stats: AdminStats | null;
       <div role="tablist" aria-label="Admin sections" className="flex flex-wrap gap-1">
         {TABS.map((t) => (
           <button key={t} role="tab" id={`atab-${t}`} aria-selected={tab === t} aria-controls={`apanel-${t}`} onClick={() => setTab(t)}
-            className={`min-h-11 px-4 font-semibold ${tab === t ? 'rounded-[4px] bg-accent text-accent-ink' : 'rounded-[4px] text-muted hover:bg-surface-2 hover:text-fg'}`}>{t}</button>
+            className={`min-h-11 px-5 font-bold ${tab === t ? 'rounded-full border-2 border-ink-line bg-accent text-accent-ink' : 'rounded-full border-2 border-transparent text-muted hover:bg-surface-2 hover:text-fg'}`}>{t}</button>
         ))}
       </div>
       <div role="tabpanel" id={`apanel-${tab}`} aria-labelledby={`atab-${tab}`} className="mt-6">

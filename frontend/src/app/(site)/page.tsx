@@ -5,45 +5,43 @@ import EventExplorer from '@/components/events/EventExplorer';
 import TicketHero from '@/components/home/TicketHero';
 import Ticker from '@/components/home/Ticker';
 import Proof from '@/components/home/Proof';
+import { photoMap } from '@/lib/photos';
 import Faq from '@/components/ui/Faq';
+import Icon, { Burst } from '@/components/ui/Icon';
 import { HoldTimer, Queue, SeatPlan, TicketArt } from '@/components/ui/Pictures';
 
-// Each sheet slides up over the one before it. Fills come from the page's palette, ink chosen per sheet.
-const SHEETS = [
-  { name: 'Never oversold', text: 'Checking and taking a seat happen in one database step. Two people can never get the last seat, however many click at once.', bg: 'bg-[#d6cecb] text-[#2b2622]', art: <SeatPlan className="w-full" /> },
-  { name: 'Timed holds', text: 'A seat is held while you fill in the form. If you walk away, the timer runs out and the seat goes back to the pool.', bg: 'bg-[#2b2622] text-[#f6f2f0]', art: <HoldTimer className="mx-auto w-full max-w-xs" /> },
-  { name: 'A waitlist that runs itself', text: 'When a seat frees up, the first person in line is given it, in order, with nobody refreshing the page.', bg: 'bg-[#0f7d45] text-white', art: <Queue className="w-full max-w-lg" /> },
-  { name: 'Signed QR tickets', text: 'Every ticket carries a signature. Edited, copied or forged codes are rejected at the gate, and a real one works exactly once.', bg: 'bg-[#5f5753] text-[#f6f2f0]', art: <TicketArt className="w-full max-w-md" /> },
+// The four promises, as offer-style cards: a coloured picture panel on top, the name and a line below.
+const FEATURES = [
+  { name: 'Never oversold', text: 'Checking and taking a seat happen in one database step. Two people can never get the last seat, however many click at once.', bg: '#fdd4b6', art: <SeatPlan className="w-full" /> },
+  { name: 'Timed holds', text: 'A seat is held while you fill in the form. If you walk away, the timer runs out and the seat goes back to the pool.', bg: '#f4c542', art: <HoldTimer className="mx-auto w-full max-w-xs" /> },
+  { name: 'A waitlist that runs itself', text: 'When a seat frees up, the first person in line is given it, in order, with nobody refreshing the page.', bg: '#c5dba8', art: <Queue className="w-full max-w-lg" /> },
+  { name: 'Signed QR tickets', text: 'Every ticket carries a signature. Edited, copied or forged codes are rejected at the gate, and a real one works exactly once.', bg: '#e8883a', art: <TicketArt className="w-full max-w-md" /> },
 ];
 
-const SLIP: { when: string; rows: [string, string][] }[] = [
-  { when: 'Before the event', rows: [['Find an event and open it', '1 min'], ['Hold a seat', '5:00 timer'], ['Answer the registration questions', '1 min'], ['Confirm, and the QR ticket appears', 'instant']] },
-  { when: 'On the day', rows: [['Show the QR ticket at the gate', '2 sec'], ['A volunteer scans it on a phone', '2 sec']] },
-];
+const ATTENDEE = ['Hold a seat while you fill in the registration form', 'A signed QR ticket on your phone the moment you confirm', 'Automatic waitlist when an event fills up', 'One account for every society’s events'];
+const ORGANIZER = ['Publish events with your own registration questions', 'Live seats, waitlist and one-click CSV export', 'Add volunteers who scan tickets at the gate', 'Raise capacity, cancel or close any time'];
 
 export default async function Home() {
   const { status, data } = await publicFetch<{ events: PublicEvent[] }>('/public/events', 20);
   const events = data?.events ?? [];
   const ok = status === 200;
-  const soonest = events.filter((e) => e.registration_state === 'OPEN').sort((a, b) => a.starts_at.localeCompare(b.starts_at))[0] ?? null;
-
   const openEvents = events.filter((e) => e.registration_state === 'OPEN');
   const seatsFree = openEvents.reduce((n, e) => n + e.seats_left, 0);
 
   return (
     <>
-      <TicketHero event={soonest} open={openEvents.length} seats={seatsFree} />
+      <TicketHero events={events} open={openEvents.length} seats={seatsFree} />
       <Ticker events={events} />
 
       {/* events */}
-      <section id="events" className="scroll-mt-24 pt-16 sm:pt-20" aria-labelledby="events-h">
-        <h2 id="events-h" className="display reveal text-5xl sm:text-6xl">Upcoming events</h2>
-        <p className="reveal mt-4 max-w-[60ch] text-lg">Pick one, hold your seat, and you are done. Seat counts update live.</p>
+      <section id="events" className="scroll-mt-28 pt-12 sm:pt-16" aria-labelledby="events-h">
+        <h2 id="events-h" className="display text-center text-4xl sm:text-6xl">Events open for registration</h2>
+        <p className="mx-auto mt-4 max-w-[52ch] text-center text-lg text-muted">Every upcoming hackathon, workshop and talk from the societies on campus. Pick one, hold your seat, done.</p>
         <div className="mt-10">
           {!ok && (
-            <div role="alert" className="card flex flex-col items-start gap-3 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div role="alert" className="card mx-auto flex max-w-3xl flex-col items-start gap-3 p-6 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="display text-3xl">Events did not load</p>
+                <p className="display text-2xl">Events did not load</p>
                 <p className="mt-1 text-muted">The server may be waking up after a quiet spell. Try again in a few seconds.</p>
                 {process.env.NODE_ENV !== 'production' && <p className="hint mt-2">Developer note: the website could not reach the backend. Start it with <code>npm run dev</code> (from the project root) and check http://localhost:4000/health.</p>}
               </div>
@@ -51,26 +49,68 @@ export default async function Home() {
             </div>
           )}
           {ok && events.length === 0 && (
-            <div className="card px-6 py-14">
-              <p className="display text-4xl">No events yet</p>
-              <p className="mt-2 max-w-md text-muted">Nothing is open for registration right now. If you run a society, you can publish the first event.</p>
+            <div className="card mx-auto max-w-2xl px-6 py-14 text-center">
+              <p className="display text-3xl">No events yet</p>
+              <p className="mx-auto mt-2 max-w-md text-muted">Nothing is open for registration right now. If you run a society, you can publish the first event.</p>
               <Link href="/organizer/signup" className="btn btn-primary mt-6">Publish an event</Link>
             </div>
           )}
-          {ok && events.length > 0 && <EventExplorer events={events} />}
+          {ok && events.length > 0 && <EventExplorer events={events} photos={photoMap()} />}
+        </div>
+
+        <div className="mt-16 flex flex-col items-center gap-4 text-center">
+          <p className="display text-2xl sm:text-3xl">Want your own event here?</p>
+          <Link href="/organizer/signup" className="btn btn-primary btn-lg">Run an event <Icon name="arrow" size={18} /></Link>
         </div>
       </section>
 
-      {/* features: four colour panels, side by side */}
-      <section id="features" className="scroll-mt-24 pt-20 sm:pt-28" aria-labelledby="feat-h">
-        <h2 id="feat-h" className="display reveal text-5xl sm:text-6xl">What keeps it fair</h2>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          {SHEETS.map((s) => (
-            <article key={s.name} className={`reveal flex flex-col justify-between gap-6 rounded-[4px] p-6 sm:p-8 ${s.bg}`}>
-              <div className="flex h-44 items-center justify-center [&>svg]:!h-full [&>svg]:!w-auto [&>svg]:!max-w-full">{s.art}</div>
-              <div>
-                <h3 className="display text-3xl">{s.name}</h3>
-                <p className="mt-2 max-w-[46ch] text-lg">{s.text}</p>
+      {/* pricing / tiers */}
+      <section id="pricing" className="scroll-mt-28 pt-24 sm:pt-32" aria-labelledby="pricing-h">
+        <h2 id="pricing-h" className="display text-center text-4xl sm:text-6xl">Free for students. Free for societies.</h2>
+        <p className="mt-6 flex items-center justify-center gap-3 text-center text-lg font-extrabold uppercase tracking-wide">
+          <Icon name="flame" size={26} className="text-accent" /> One platform, three ways in <Icon name="flame" size={26} className="text-accent" />
+        </p>
+        <div className="mx-auto mt-12 grid max-w-5xl gap-8 md:grid-cols-2">
+          <article className="tier" style={{ background: '#fdd4b6' }}>
+            <h3 className="display text-3xl">Attendee</h3>
+            <p className="mt-3 flex items-baseline gap-2"><span className="display text-6xl">Free</span><span className="text-lg">/ always</span></p>
+            <ul className="mt-8">
+              {ATTENDEE.map((t) => <li key={t}><Icon name="check" size={20} className="mt-0.5 shrink-0" /><span>{t}</span></li>)}
+            </ul>
+            <Link href="/register" className="btn btn-primary btn-lg mt-auto w-full !mt-8">Get your pass</Link>
+          </article>
+          <article className="tier relative" style={{ background: '#e9ae70' }}>
+            <Burst className="-right-5 -top-9 !h-28 !w-28 !text-base" rotate={14}>Best for<br />societies</Burst>
+            <h3 className="display text-3xl">Organizer</h3>
+            <p className="mt-3 flex items-baseline gap-2"><span className="display text-6xl">Free</span><span className="text-lg">/ to start</span></p>
+            <p className="mt-8 flex items-center gap-2 text-sm font-medium">Everything in Attendee, plus <Icon name="arrow" size={16} className="rotate-90" /></p>
+            <ul className="mt-2">
+              {ORGANIZER.map((t) => <li key={t}><Icon name="check" size={20} className="mt-0.5 shrink-0" /><span>{t}</span></li>)}
+            </ul>
+            <Link href="/organizer/signup" className="btn btn-primary btn-lg w-full !mt-8">Become an organizer</Link>
+          </article>
+        </div>
+        <div className="mx-auto mt-8 flex max-w-5xl flex-col items-center justify-between gap-5 rounded-[28px] border-2 border-ink-line bg-card p-6 text-card-fg sm:flex-row sm:p-8">
+          <div className="flex items-center gap-4">
+            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border-2 border-ink-line bg-yellow text-[#141414]"><Icon name="scan" size={28} /></span>
+            <div><p className="display text-2xl">Volunteer gate desk</p><p className="text-muted">Camera scanner, search and manual check-in. Included with every event, no extra plan.</p></div>
+          </div>
+          <Link href="/dashboard" className="btn shrink-0">Open the gate scanner</Link>
+        </div>
+      </section>
+
+      {/* features */}
+      <section id="features" className="scroll-mt-28 pt-24 sm:pt-32" aria-labelledby="feat-h">
+        <h2 id="feat-h" className="display text-center text-4xl sm:text-6xl">What keeps it fair</h2>
+        <div className="mx-auto mt-14 grid max-w-5xl gap-x-8 gap-y-14 sm:grid-cols-2">
+          {FEATURES.map((f) => (
+            <article key={f.name} className="offer pb-3">
+              <div className="offer-body">
+                <div className="flex h-52 items-center justify-center border-b-[3px] border-dotted border-[#141414] p-6 [&>svg]:!h-full [&>svg]:!w-auto [&>svg]:!max-w-full" style={{ background: f.bg }}>{f.art}</div>
+                <div className="px-6 pb-7 pt-5">
+                  <h3 className="display text-2xl">{f.name}</h3>
+                  <p className="mt-2 text-muted">{f.text}</p>
+                </div>
               </div>
             </article>
           ))}
@@ -79,47 +119,21 @@ export default async function Home() {
 
       <Proof />
 
-      {/* how it works: an itinerary on a slip */}
-      <section id="how" className="scroll-mt-24 pt-20 sm:pt-28" aria-labelledby="how-h">
-        <div className="grid items-start gap-10 lg:grid-cols-[1fr_30rem] lg:gap-20">
-          <div>
-            <h2 id="how-h" className="display reveal text-5xl sm:text-6xl">From click to front row</h2>
-            <p className="reveal mt-5 max-w-[34ch] text-lg">The whole journey takes about eight minutes, and most of it is you reading the registration form.</p>
-          </div>
-          <div className="slip reveal px-6 pt-6">
-            {SLIP.map((g) => (
-              <div key={g.when} className="mt-6 first:mt-0">
-                <h3 className="text-xl font-semibold">{g.when}</h3>
-                <ol className="mt-2 space-y-2">
-                  {g.rows.map(([what, t]) => (
-                    <li key={what} className="flex items-end gap-2"><span>{what}</span><span className="leader" aria-hidden /><span className="num">{t}</span></li>
-                  ))}
-                </ol>
-              </div>
-            ))}
-            <p className="-mx-6 mt-6 flex items-center justify-between bg-[#2b2622] px-6 py-3 text-[#f6f2f0]"><span>One QR ticket, one entry</span><span className="num">about 8 min</span></p>
-          </div>
-        </div>
-      </section>
-
-      {/* organizers: the reply card */}
-      <section className="bleed mt-24 overflow-hidden bg-[#2b2622] sm:mt-32" aria-labelledby="org-h">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-16 sm:px-6 sm:pt-20 lg:grid-cols-[1fr_1.2fr]">
-          <p className="reveal max-w-[34ch] self-center text-xl text-[#f6f2f0]">Publish an event in a few minutes, share one link, and watch the seats fill. Holds, the waitlist, tickets and check-in are handled for you.</p>
-          <div className="reveal rotate-[-2deg] bg-[#f6f2f0] p-8 text-center text-[#2b2622] sm:p-12">
-            <h2 id="org-h" className="display text-3xl sm:text-4xl">Run your society&apos;s next event</h2>
-            <p className="mx-auto mt-3 max-w-xs text-[1.05rem]">Free to start. Your own login and your own dashboard.</p>
-            <Link href="/organizer/signup" className="btn btn-primary btn-lg mt-6 w-full">Open the organizer portal</Link>
-            <Link href="/organizer/login" className="mt-4 inline-block underline underline-offset-4">I already have an organizer account</Link>
-          </div>
-        </div>
-        <div className="h-0" aria-hidden />
-      </section>
-
       {/* faq */}
-      <section id="faq" className="scroll-mt-24 pt-24 sm:pt-32" aria-labelledby="faq-h">
-        <h2 id="faq-h" className="display reveal mb-10 text-5xl sm:text-6xl">Good to know</h2>
+      <section id="faq" className="scroll-mt-28 pt-24 sm:pt-32" aria-labelledby="faq-h">
+        <h2 id="faq-h" className="display mb-10 text-center text-4xl sm:text-6xl">Questions?</h2>
         <Faq />
+        <p className="mt-8 text-center text-muted">Still stuck? Ask your society&apos;s organizer, or write to the volunteers at the gate.</p>
+      </section>
+
+      {/* closing call to action */}
+      <section className="pt-24 text-center sm:pt-32" aria-labelledby="cta-h">
+        <h2 id="cta-h" className="display mx-auto max-w-[18ch] text-4xl sm:text-6xl">Fill every seat, exactly once</h2>
+        <p className="mx-auto mt-5 max-w-[52ch] text-lg text-muted">Find an event, hold your seat, and walk in with a ticket nobody can forge. Or publish your own in a few minutes.</p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link href="/#events" className="btn btn-primary btn-lg">Browse events <Icon name="arrow" size={18} /></Link>
+          <Link href="/organizer/signup" className="btn btn-lg">Run an event</Link>
+        </div>
       </section>
     </>
   );

@@ -3,25 +3,28 @@
 /* Dark mode follows the OS by default; the toggle sets data-theme on <html> to force either mode. */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-/* ---- Design tokens. Light is the default; dark follows the OS or the toggle (data-theme). ---- */
+/* ---- Design tokens. A warm "pass" look: cream page, peach panels, orange actions, white cards with thick black outlines. ---- */
 :root {
-  --bg: #ebe5e3;         /* rose grey ground */
-  --surface: #e1dad7;    /* one step darker: cards and panels, no outlines */
-  --surface-2: #d6cecb;
-  --paper: #f6f2f0;      /* the paper of the ticket and cards */
-  --fg: #2b2622;
-  --muted: #5f5753;      /* 5.2:1 on --bg */
-  --line: #cfc6c2;
-  --ink-line: #2b2622;
-  --accent: #0f7d45;     /* the one accent: the action */
-  --accent-2: #0f7d45;
-  --accent-ink: #ffffff;
-  --accent-text: #0b6637;
+  --bg: #fff1e8;         /* cream page */
+  --surface: #fde3d0;    /* light peach */
+  --surface-2: #fdd4b6;  /* peach */
+  --paper: #ffffff;      /* cards, fields */
+  --card: #ffffff;
+  --card-fg: #141414;
+  --fg: #141414;
+  --muted: #6a5648;
+  --line: #ecc9ad;
+  --ink-line: #141414;
+  --accent: #e8883a;     /* orange: the action */
+  --accent-2: #da915a;   /* tan */
+  --accent-ink: #141414;
+  --accent-text: #b4570f;
+  --pink: #fdd4b6; --orange: #e8883a; --yellow: #f4c542; --sage: #c5dba8; --cobalt: #da915a; --tan: #da915a;
   --warm: #9a5a14;
-  --ok: #0f7d45;
-  --ok-bg: #cfe7da;
-  --bad: #a82a1f;
-  --bad-bg: #f1d5d0;
+  --ok: #1f8a4c;
+  --ok-bg: #d4ead9;
+  --bad: #b3261e;
+  --bad-bg: #f9d9d3;
   --hold: #8f6200;
   --shadow: none;
   --shadow-lg: none;
@@ -29,15 +32,15 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #1c1816; --surface: #27211e; --surface-2: #322b27; --paper: #efe8e5; --fg: #efe8e5; --muted: #a79e99; --line: #3a322e; --ink-line: #efe8e5;
-    --accent: #3fc182; --accent-2: #3fc182; --accent-ink: #10231a; --accent-text: #62d49b; --warm: #e0a65b;
+    --bg: #1a1310; --surface: #261b15; --surface-2: #33241b; --paper: #2a1e17; --card: #261b15; --card-fg: #fff1e8; --fg: #fff1e8; --muted: #c2a995; --line: #4a362a; --ink-line: #fff1e8;
+    --accent: #f19a50; --accent-text: #f6b57f; --warm: #e0a65b;
     --ok: #62d49b; --ok-bg: #163425; --bad: #ff9c94; --bad-bg: #432019; --hold: #e3b341;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #1c1816; --surface: #27211e; --surface-2: #322b27; --paper: #efe8e5; --fg: #efe8e5; --muted: #a79e99; --line: #3a322e; --ink-line: #efe8e5;
-  --accent: #3fc182; --accent-2: #3fc182; --accent-ink: #10231a; --accent-text: #62d49b; --warm: #e0a65b;
+  --bg: #1a1310; --surface: #261b15; --surface-2: #33241b; --paper: #2a1e17; --card: #261b15; --card-fg: #fff1e8; --fg: #fff1e8; --muted: #c2a995; --line: #4a362a; --ink-line: #fff1e8;
+  --accent: #f19a50; --accent-text: #f6b57f; --warm: #e0a65b;
   --ok: #62d49b; --ok-bg: #163425; --bad: #ff9c94; --bad-bg: #432019; --hold: #e3b341;
   color-scheme: dark;
 }
@@ -49,6 +52,7 @@
   --color-fg: var(--fg);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-ink-line: var(--ink-line);
   --color-accent: var(--accent);
   --color-accent-2: var(--accent-2);
   --color-accent-ink: var(--accent-ink);
@@ -59,111 +63,143 @@
   --color-ok-bg: var(--ok-bg);
   --color-bad: var(--bad);
   --color-bad-bg: var(--bad-bg);
-  --font-display: "Erode", Georgia, "Times New Roman", serif;
-  --font-sans: "Erode", Georgia, "Times New Roman", serif;
   --color-paper: var(--paper);
+  --font-display: "Bricolage Grotesque", "DM Sans", system-ui, sans-serif;
+  --font-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "DM Sans", system-ui, sans-serif;
 }
 
-html { background: var(--bg); scroll-behavior: smooth; scrollbar-gutter: stable; }
-body { background: var(--bg); color: var(--fg); font-family: var(--font-sans); font-size: 1.0625rem; -webkit-font-smoothing: antialiased; line-height: 1.5; overflow-x: clip; }
+html { background: var(--bg); scroll-behavior: smooth; scrollbar-gutter: stable; overflow-x: clip; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-sans); font-size: 1.0625rem; -webkit-font-smoothing: antialiased; line-height: 1.55; overflow-x: clip; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
-/* Visible keyboard focus everywhere. */
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 ::selection { background: var(--accent); color: var(--accent-ink); }
 
-/* Erode: a chiselled serif, tight at display size, firm in text. */
-.display { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.025em; line-height: 0.98; }
+/* Bricolage Grotesque for headings, DM Sans for reading, Anton (slanted) for the big "value" numbers. */
+.display { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.025em; line-height: 1.02; }
+.mono { font-family: var(--font-sans); }
 .num { font-variant-numeric: tabular-nums; }
+.value { font-family: "Anton", Impact, "Arial Narrow", sans-serif; font-style: italic; text-transform: uppercase; letter-spacing: .01em; transform: skewX(-6deg); display: inline-block; }
 
-/* Motion only where it helps: counts that change, seats filling in the hero, cards lifting on hover. */
 @keyframes seat-tick { from { opacity: 0.2; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 .seat-tick { animation: seat-tick 350ms ease-out; }
 @keyframes seat-pop { 0% { transform: scale(.4); opacity: 0; } 70% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
 @keyframes float-y { 0%,100% { transform: translateY(0) rotate(var(--r, 0deg)); } 50% { transform: translateY(-10px) rotate(var(--r, 0deg)); } }
+@keyframes sway { 0%,100% { transform: rotate(var(--r0, -4deg)); } 50% { transform: rotate(var(--r1, 1deg)); } }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-.rise { animation: none; }
 .float-y { animation: none; }
-@media (prefers-reduced-motion: reduce) { .seat-tick, .rise, .float-y { animation: none; } .seat-pop { animation: none !important; opacity: 1 !important; } }
+@media (prefers-reduced-motion: reduce) { .seat-tick, .float-y, .sway { animation: none; } .seat-pop { animation: none !important; opacity: 1 !important; } }
 
 /* Markdown content (organiser-written event description). */
 .prose-sl { max-width: 65ch; }
 .prose-sl > * + * { margin-top: 1em; }
-.prose-sl h1, .prose-sl h2, .prose-sl h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.1; margin-top: 1.6em; }
+.prose-sl h1, .prose-sl h2, .prose-sl h3 { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin-top: 1.6em; }
 .prose-sl h1 { font-size: 1.9rem; } .prose-sl h2 { font-size: 1.5rem; } .prose-sl h3 { font-size: 1.2rem; }
 .prose-sl ul { list-style: disc; padding-left: 1.4em; } .prose-sl ol { list-style: decimal; padding-left: 1.4em; }
 .prose-sl li + li { margin-top: 0.3em; }
 .prose-sl a { color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; }
-.prose-sl blockquote { border-left: 3px solid var(--accent); padding-left: 1em; color: var(--muted); }
-.prose-sl code { background: var(--surface); background-color: var(--surface-2); padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.9em; }
-.prose-sl pre { background: var(--surface-2); padding: 1em; overflow-x: auto; }
+.prose-sl blockquote { border-left: 4px solid var(--accent); padding-left: 1em; color: var(--muted); }
+.prose-sl code { background-color: var(--surface-2); padding: 0.1em 0.35em; border-radius: 6px; font-size: 0.9em; }
+.prose-sl pre { background: var(--surface-2); padding: 1em; overflow-x: auto; border-radius: 14px; }
 .prose-sl hr { border-color: var(--line); }
 
-/* Form + button primitives. Flat fills, one corner radius, no outlines, no shadows: surfaces are told apart by a step in tone. */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; padding: 0 1.2rem; font-weight: 600; border: 0; background: var(--surface-2); color: var(--fg); cursor: pointer; border-radius: 4px; text-decoration: none; transition: background .15s ease, color .15s ease, transform .1s ease; }
-.btn:hover:not(:disabled) { background: var(--fg); color: var(--bg); }
+/* Buttons: pills with a black outline. The primary one is the orange "Get Product Pass" button of the reference. */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; padding: 0 1.3rem; font-weight: 700; border: 2px solid var(--ink-line); background: var(--card); color: var(--card-fg); cursor: pointer; border-radius: 999px; text-decoration: none; transition: background .15s ease, color .15s ease, transform .1s ease, box-shadow .15s ease; }
+.btn:hover:not(:disabled) { background: var(--surface-2); color: var(--fg); }
 .btn:active:not(:disabled) { transform: translateY(1px); }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
-.btn-primary { background: var(--accent); color: var(--accent-ink); }
-.btn-primary:hover:not(:disabled) { background: var(--fg); color: var(--bg); }
-.btn-ghost { background: transparent; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 var(--ink-line); }
+.btn-primary:hover:not(:disabled) { background: #f39a4f; color: var(--accent-ink); box-shadow: 0 5px 0 var(--ink-line); transform: translateY(-1px); }
+.btn-primary:active:not(:disabled) { box-shadow: 0 1px 0 var(--ink-line); transform: translateY(2px); }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--fg); }
 .btn-ghost:hover:not(:disabled) { background: var(--surface-2); color: var(--fg); }
-.btn-lg { min-height: 3.25rem; padding: 0 1.7rem; font-size: 1.1rem; }
-.btn-sm { min-height: 2.25rem; padding: 0 .9rem; font-size: .95rem; }
-.btn-danger { background: var(--bad-bg); color: var(--bad); }
-.btn-danger:hover:not(:disabled) { background: var(--bad); color: var(--bg); }
-.field { width: 100%; min-height: 2.9rem; padding: .6rem .8rem; background: var(--paper); color: #2b2622; border: 1.5px solid var(--line); border-radius: 4px; font: inherit; transition: border-color .12s; }
-.field:hover { border-color: var(--muted); }
-.field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); /* taste-skill-ignore: focus ring */ }
+.btn-lg { min-height: 3.25rem; padding: 0 1.7rem; font-size: 1.08rem; }
+.btn-sm { min-height: 2.3rem; padding: 0 .95rem; font-size: .95rem; }
+.btn-danger { background: var(--bad-bg); color: var(--bad); border-color: var(--bad); }
+.btn-danger:hover:not(:disabled) { background: var(--bad); color: #fff; }
+
+.field { width: 100%; min-height: 2.9rem; padding: .6rem .95rem; background: var(--paper); color: var(--card-fg); border: 2px solid var(--ink-line); border-radius: 14px; font: inherit; transition: border-color .12s, box-shadow .12s; }
+.field::placeholder { color: color-mix(in srgb, currentColor 45%, transparent); }
+.field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent); }
 .field[aria-invalid="true"] { border-color: var(--bad); }
 textarea.field { min-height: 6rem; }
-.label { display: block; font-weight: 600; margin-bottom: .35rem; font-size: .95rem; }
+.label { display: block; font-weight: 700; margin-bottom: .35rem; font-size: .95rem; }
 .hint { color: var(--muted); font-size: .9rem; }
 .err { color: var(--bad); font-size: .9rem; margin-top: .25rem; }
-.card { background: var(--surface); border-radius: 4px; }
-.card-hover { transition: background .15s ease; }
-.card-hover:hover { background: var(--surface-2); }
-.tag { display: inline-flex; align-items: center; gap: .4rem; padding: .1rem .5rem; border-radius: 3px; background: var(--surface-2); font-size: .85rem; font-weight: 600; }
-.chip { display: inline-flex; align-items: center; gap: .4rem; min-height: 2.5rem; padding: 0 1rem; border-radius: 4px; background: var(--surface); font-weight: 600; font-size: .95rem; cursor: pointer; transition: background .15s, color .15s; }
-.chip:hover { background: var(--surface-2); }
-.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+
+/* Cards: white, 2px black outline, big radius. */
+.card { background: var(--card); color: var(--card-fg); border: 2px solid var(--ink-line); border-radius: 24px; }
+.card .text-muted, .card .hint { color: var(--muted); }
+.card-hover { transition: transform .15s ease; }
+.card-hover:hover { transform: translateY(-3px); }
+.tag { display: inline-flex; align-items: center; gap: .4rem; padding: .12rem .7rem; border-radius: 999px; background: var(--card); color: var(--card-fg); border: 2px solid var(--ink-line); font-size: .82rem; font-weight: 700; }
+.chip { display: inline-flex; align-items: center; gap: .4rem; min-height: 2.5rem; padding: 0 1.1rem; border-radius: 999px; background: var(--card); color: var(--card-fg); border: 2px solid var(--ink-line); font-weight: 700; font-size: .95rem; cursor: pointer; transition: background .15s, color .15s; }
+.chip:hover { background: var(--surface-2); color: var(--fg); }
+.chip[aria-pressed="true"] { background: var(--ink-line); color: var(--bg); }
 .bleed { position: relative; left: 50%; right: 50%; width: 100vw; margin-left: -50vw; margin-right: -50vw; }
 
-/* A ticket is a filled paper shape. The two bites are what a ticket punch leaves; the stub is cut off by a row of round dots. */
-.ticket { position: relative; display: grid; grid-template-columns: var(--stub, 5.5rem) 1fr; background: var(--paper); color: #2b2622; border-radius: 4px;
-  -webkit-mask: radial-gradient(circle .6rem at var(--stub, 5.5rem) 0, #0000 97%, #000) top / 100% 51% no-repeat, radial-gradient(circle .6rem at var(--stub, 5.5rem) 100%, #0000 97%, #000) bottom / 100% 51% no-repeat; /* taste-skill-ignore: a mask that cuts the shape, not a fill */
-          mask: radial-gradient(circle .6rem at var(--stub, 5.5rem) 0, #0000 97%, #000) top / 100% 51% no-repeat, radial-gradient(circle .6rem at var(--stub, 5.5rem) 100%, #0000 97%, #000) bottom / 100% 51% no-repeat; } /* taste-skill-ignore: a mask that cuts the shape, not a fill */
-.ticket-stub { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem .5rem; background: #2b2622; color: #f6f2f0; border-right: 4px dotted var(--paper); }
-.ticket-hover { transition: transform .15s ease; } .ticket-hover:hover { transform: translateY(-3px) rotate(-.3deg); }
-.ticket .muted, .ticket .text-muted { color: #5f5753; }
-.seat { display: inline-block; width: .8rem; height: .8rem; border-radius: 2px; background: var(--ok); }
-.seat-held { background: var(--hold); } .seat-taken { background: #cfc6c2; }
+/* Tickets (kept for the QR page and registration panel): a white ticket with punched sides, dotted tear line. */
+.ticket { position: relative; display: grid; grid-template-columns: var(--stub, 5.5rem) 1fr; background: #fff; color: #141414; border: 2px solid #141414; border-radius: 20px; overflow: hidden; }
+.ticket-stub { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem .5rem; background: var(--accent); color: #141414; border-right: 3px dotted #141414; }
+.ticket .muted, .ticket .text-muted { color: #5f5047; }
+.seat { display: inline-block; width: .8rem; height: .8rem; border-radius: 3px; background: var(--ok); }
+.seat-held { background: var(--hold); } .seat-taken { background: #cdbcaf; }
 
-/* Entrances: parts of a section rise as it scrolls into view. Pure CSS; browsers without scroll timelines just show everything. */
-@keyframes rise-in { from { transform: translateY(32px); } to { transform: none; } }
+/* Entrances: parts of a section rise as it scrolls into view (pure CSS). */
+@keyframes rise-in { from { transform: translateY(28px); } to { transform: none; } }
 @supports (animation-timeline: view()) {
-  .reveal { animation: rise-in linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
+  .reveal { animation: rise-in linear both; animation-timeline: view(); animation-range: entry 0% entry 50%; }
 }
-@media (prefers-reduced-motion: reduce) { .reveal { animation: none; } .ticket-hover:hover { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .reveal { animation: none; } }
 
-/* The boarding pass of the hero: paper panel with a bite out of both sides, like a ticket that has been punched. */
-.pass { background: var(--paper); color: #2b2622; border-radius: 4px;
-  -webkit-mask: radial-gradient(circle 1rem at 0 50%, #0000 97%, #000) left / 51% 100% no-repeat, radial-gradient(circle 1rem at 100% 50%, #0000 97%, #000) right / 51% 100% no-repeat; /* taste-skill-ignore: a mask that cuts the shape, not a fill */
-          mask: radial-gradient(circle 1rem at 0 50%, #0000 97%, #000) left / 51% 100% no-repeat, radial-gradient(circle 1rem at 100% 50%, #0000 97%, #000) right / 51% 100% no-repeat; } /* taste-skill-ignore: a mask that cuts the shape, not a fill */
-.pass .btn:not(.btn-primary) { background: #e1dad7; color: #2b2622; }
-.pass .btn:not(.btn-primary):hover { background: #2b2622; color: #f6f2f0; }
-/* The slip of the how-it-works section: straight on top, zigzag cut along the bottom. */
-.slip { background: var(--paper); color: #2b2622; padding-bottom: 2.2rem; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), 95% 100%, 90% calc(100% - 14px), 85% 100%, 80% calc(100% - 14px), 75% 100%, 70% calc(100% - 14px), 65% 100%, 60% calc(100% - 14px), 55% 100%, 50% calc(100% - 14px), 45% 100%, 40% calc(100% - 14px), 35% 100%, 30% calc(100% - 14px), 25% 100%, 20% calc(100% - 14px), 15% 100%, 10% calc(100% - 14px), 5% 100%, 0 calc(100% - 14px)); }
-.leader { flex: 1; align-self: flex-end; margin-bottom: .35em; border-bottom: 4px dotted color-mix(in srgb, currentColor 45%, transparent); min-width: 1rem; }
-/* The back of the card: a paper panel with a scalloped top edge. */
-.scallop { -webkit-mask: radial-gradient(circle 1.6rem at 50% 0, #0000 97%, #000) top left / 3.2rem 51% repeat-x, linear-gradient(#000, #000) bottom / 100% 60% no-repeat; mask: radial-gradient(circle 1.6rem at 50% 0, #0000 97%, #000) top left / 3.2rem 51% repeat-x, linear-gradient(#000, #000) bottom / 100% 60% no-repeat; } /* taste-skill-ignore: a mask that cuts the shape, not a fill */
-/* Sheets that slide over one another, like tabbed folders in a drawer. */
-.sheet { position: sticky; top: calc(4rem + var(--i) * 3.5rem); border-radius: 28px 28px 0 0; min-height: 70svh; }
-.sheet > h3 { height: 2.5rem; line-height: 2.5rem; margin-bottom: 1.75rem; }
-@media (max-width: 640px) { .ticket { --stub: 4.25rem; } .sheet { top: calc(4rem + var(--i) * 3rem); border-radius: 20px 20px 0 0; } }
+.leader { flex: 1; align-self: flex-end; margin-bottom: .35em; border-bottom: 3px dotted color-mix(in srgb, currentColor 45%, transparent); min-width: 1rem; }
+.dotted { border-top: 3px dotted var(--ink-line); }
+.dotted-b { border-bottom: 2px dotted color-mix(in srgb, var(--ink-line) 55%, transparent); }
 
-/* Departures strip on the home page. */
+/* Colour fills. The names are kept from the old palette so every page picks the new look up. */
+.bg-pink { background: var(--surface-2); color: #141414; } .bg-orange { background: var(--orange); color: #141414; } .bg-yellow { background: var(--yellow); color: #141414; }
+.bg-sage { background: var(--sage); color: #141414; } .bg-cobalt { background: var(--tan); color: #141414; }
+
+/* Stickers and stamps: small round badges, outlined. */
+.sticker { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: .35rem .85rem; border: 2px solid #141414; border-radius: 999px; color: #141414; font-weight: 800; line-height: 1.1; font-size: .85rem; }
+.sticker small { display: block; font-size: .7rem; font-weight: 500; }
+.sticker-sm { padding: .12rem .65rem; font-size: .78rem; }
+.stamp { display: grid; place-items: center; width: 6.2rem; height: 6.2rem; border: 2px solid #141414; border-radius: 999px; font-family: var(--font-display); font-weight: 800; line-height: 1; text-align: center; transform: rotate(var(--r, 12deg)); }
+.circle-score { display: grid; place-items: center; width: 4rem; height: 4rem; border: 2px solid currentColor; border-radius: 999px; font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; line-height: 1; }
+
+/* Starburst badge (the yellow "NEW" / "EXCLUSIVE OFFERS" seal). */
+.burst { position: absolute; z-index: 5; display: grid; place-items: center; width: 5.6rem; height: 5.6rem; transform: rotate(var(--r, 14deg)); text-align: center; font-family: "Anton", Impact, sans-serif; font-style: italic; text-transform: uppercase; line-height: 1; color: #141414; font-size: 1.05rem; pointer-events: none; }
+.burst > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.burst > span { position: relative; padding: 0 .5rem; }
+
+/* Snapshots are now plain rounded posters with an outline. */
+.snap { position: relative; display: block; overflow: hidden; border: 2px solid var(--ink-line); border-radius: 20px; background: var(--surface); }
+.snap > img, .snap > svg, .snap > .snap-art { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Offer card (event card): a white card with a tan layer peeking out below it, dotted tear line, "value" footer. */
+.offer { position: relative; display: flex; flex-direction: column; isolation: isolate; }
+.offer::before { content: ""; position: absolute; z-index: -1; inset: 10px 0 -10px 0; border-radius: 30px; border: 2px solid #141414; background: var(--tan); transition: transform .2s ease; }
+.offer > .offer-body { display: flex; flex: 1; flex-direction: column; overflow: hidden; border: 2px solid #141414; border-radius: 30px; background: var(--card); color: var(--card-fg); transition: transform .2s ease; }
+.offer:hover > .offer-body, .offer:focus-visible > .offer-body { transform: translateY(-6px); }
+.offer:hover::before, .offer:focus-visible::before { transform: translateY(-2px); }
+.offer-foot { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: 1rem 1.4rem 1.1rem; background: var(--surface-2); color: #141414; border-top: 3px dotted #141414; }
+
+/* Pricing tiers */
+.tier { position: relative; display: flex; flex-direction: column; border: 2px solid #141414; border-radius: 28px; padding: 2rem; color: #141414; }
+.tier li { display: flex; align-items: flex-start; gap: .7rem; padding: .85rem 0; border-top: 2px dotted rgba(20,20,20,.5); }
+
+/* Logo marquee */
 @keyframes marquee { to { transform: translateX(-50%); } }
 .marquee { animation: marquee 45s linear infinite; }
 .marquee:hover { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .marquee { animation: none; } }
+
+/* Hero badges hanging on lanyards */
+.badge-card { position: absolute; border: 2px solid #141414; border-radius: 26px; background: var(--surface-2); box-shadow: 0 8px 0 rgba(20,20,20,.12); }
+.sway { animation: sway 6s ease-in-out infinite; transform-origin: 50% 0; }
+
+.panel-round { border-radius: 40px 40px 0 0; }
+
+/* Hide scrollbars on the horizontal filter strip on phones. */
+.no-scrollbar { scrollbar-width: none; } .no-scrollbar::-webkit-scrollbar { display: none; }

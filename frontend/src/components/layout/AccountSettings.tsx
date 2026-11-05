@@ -53,7 +53,7 @@ export default function AccountSettings({ portal, user, links }: Props) {
   return (
     <div className="mx-auto max-w-2xl">
       <div className="flex items-center gap-4">
-        <span className="grid h-16 w-16 shrink-0 place-items-center rounded-[4px] bg-accent text-3xl font-bold text-accent-ink">{user.name.trim().charAt(0).toUpperCase()}</span>
+        <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-accent text-3xl font-bold text-accent-ink">{user.name.trim().charAt(0).toUpperCase()}</span>
         <div className="min-w-0">
           <h1 className="display truncate text-4xl sm:text-5xl">{user.name}</h1>
           <p className="truncate text-muted">{user.email} · <span className="capitalize">{user.role === 'participant' ? 'attendee' : user.role}</span>{user.organization ? ` · ${user.organization}` : ''}</p>
@@ -65,7 +65,7 @@ export default function AccountSettings({ portal, user, links }: Props) {
           <h2 id="acc-links" className="display text-2xl">Your pages</h2>
           <ul className="mt-3 space-y-2">
             {links.map((l) => (
-              <li key={l.href}><Link href={l.href} className="flex items-center justify-between gap-4 rounded-[4px] bg-surface-2 px-4 py-4"><span><span className="block font-semibold">{l.label}</span>{l.hint && <span className="block text-sm text-muted">{l.hint}</span>}</span><Icon name="arrow" className="shrink-0 text-muted" /></Link></li>
+              <li key={l.href}><Link href={l.href} className="flex items-center justify-between gap-4 rounded-2xl bg-surface-2 px-4 py-4"><span><span className="block font-semibold">{l.label}</span>{l.hint && <span className="block text-sm text-muted">{l.hint}</span>}</span><Icon name="arrow" className="shrink-0 text-muted" /></Link></li>
             ))}
           </ul>
         </section>

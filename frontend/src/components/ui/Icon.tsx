@@ -20,6 +20,7 @@ const P: Record<string, React.ReactNode> = {
   sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" /></>,
   moon: <path d="M20.5 13.2A8.5 8.5 0 1 1 10.8 3.5a7 7 0 0 0 9.7 9.7Z" />,
   chevron: <path d="m6 9 6 6 6-6" />,
+  flame: <path d="M12 2.5c.5 3-1.5 4.6-3 6.5-1.7 2.1-2.5 3.9-2.5 6a5.5 5.5 0 0 0 11 0c0-2.6-1.4-4-2.4-5.4-.5 1.2-1.3 1.9-2 2 .6-3.4.1-6.7-1.1-9.1Z" />,
   logout: <><path d="M10 4H6.5A2.5 2.5 0 0 0 4 6.5v11A2.5 2.5 0 0 0 6.5 20H10" /><path d="M15 8l4 4-4 4M19 12H9" /></>,
 };
 export default function Icon({ name, size = 20, className = '', label }: { name: keyof typeof P | string; size?: number; className?: string; label?: string }) {
@@ -29,15 +30,28 @@ export default function Icon({ name, size = 20, className = '', label }: { name:
   );
 }
 
-/** The SeatLock mark: a rounded square holding a 2x2 seat grid, one seat claimed. */
-export function Logo({ size = 30 }: { size?: number }) {
+/** The SeatLock mark: an orange event pass with a punched hole and a 2x2 seat grid, one seat claimed. */
+export function Logo({ size = 34 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect width="32" height="32" rx="6" fill="var(--accent)" />
-      <rect x="7" y="7" width="7.5" height="7.5" rx="2.2" fill="var(--accent-ink)" opacity=".55" />
-      <rect x="17.5" y="7" width="7.5" height="7.5" rx="2.2" fill="var(--accent-ink)" opacity=".55" />
-      <rect x="7" y="17.5" width="7.5" height="7.5" rx="2.2" fill="var(--accent-ink)" opacity=".55" />
-      <rect x="17.5" y="17.5" width="7.5" height="7.5" rx="2.2" fill="var(--accent-ink)" />
+    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
+      <rect x="6" y="3" width="28" height="35" rx="8" fill="#e8883a" stroke="#141414" strokeWidth="2.5" />
+      <rect x="15.5" y="7" width="9" height="3.6" rx="1.8" fill="#fff1e8" stroke="#141414" strokeWidth="1.6" />
+      <rect x="11" y="16" width="7.5" height="7.5" rx="2.2" fill="#fff1e8" stroke="#141414" strokeWidth="1.6" />
+      <rect x="21.5" y="16" width="7.5" height="7.5" rx="2.2" fill="#fff1e8" stroke="#141414" strokeWidth="1.6" />
+      <rect x="11" y="26" width="7.5" height="7.5" rx="2.2" fill="#fff1e8" stroke="#141414" strokeWidth="1.6" />
+      <rect x="21.5" y="26" width="7.5" height="7.5" rx="2.2" fill="#141414" />
     </svg>
+  );
+}
+
+/** The yellow starburst seal ("NEW", "Almost gone"). Absolutely positioned: put it inside a `relative` box. */
+export function Burst({ children, className = '', rotate = 14, color = '#f4c542' }: { children: React.ReactNode; className?: string; rotate?: number; color?: string }) {
+  const n = 12, pts: string[] = [];
+  for (let i = 0; i < n * 2; i++) { const a = (Math.PI * i) / n; const r = i % 2 ? 40 : 48; pts.push(`${(50 + r * Math.cos(a)).toFixed(1)},${(50 + r * Math.sin(a)).toFixed(1)}`); }
+  return (
+    <span className={`burst ${className}`} style={{ ['--r' as string]: `${rotate}deg` }}>
+      <svg viewBox="0 0 100 100" aria-hidden="true"><polygon points={pts.join(' ')} fill={color} stroke="#141414" strokeWidth="3" strokeLinejoin="round" /></svg>
+      <span>{children}</span>
+    </span>
   );
 }

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600"><rect width="800" height="600" fill="#fdd4b6"/><defs><pattern id="d" width="36" height="36" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="2.4" fill="#141414" opacity=".35"/></pattern></defs><rect width="800" height="600" fill="url(#d)"/>
+    <rect x="170" y="150" width="460" height="290" rx="22" fill="#ffffff" stroke="#141414" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+    <rect x="196" y="176" width="408" height="238" rx="10" fill="#141414"/>
+    <path d="M240 232l-34 28 34 28M560 232l34 28-34 28" fill="none" stroke="#f4c542" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M444 222l-80 90" stroke="#e8883a" stroke-width="12" stroke-linecap="round"/>
+    <path d="M110 452h580l-44 40H154z" fill="#da915a" stroke="#141414" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+    <polygon points="702.0,120.0 689.1,133.2 693.7,151.0 675.9,155.9 671.0,173.7 653.2,169.1 640.0,182.0 626.8,169.1 609.0,173.7 604.1,155.9 586.3,151.0 590.9,133.2 578.0,120.0 590.9,106.8 586.3,89.0 604.1,84.1 609.0,66.3 626.8,70.9 640.0,58.0 653.2,70.9 671.0,66.3 675.9,84.1 693.7,89.0 689.1,106.8" fill="#f4c542" stroke="#141414" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><text x="640" y="130" text-anchor="middle" font-family="Arial Black, Helvetica, sans-serif" font-size="30" fill="#141414">24H</text>
+    <circle cx="150" cy="130" r="26" fill="#b9d3a0" stroke="#141414" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/></svg>

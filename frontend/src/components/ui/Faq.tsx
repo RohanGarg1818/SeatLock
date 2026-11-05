@@ -8,18 +8,17 @@ const ITEMS = [
   ['Limits', 'Can organizers limit who joins?', 'Yes. An event can be limited to certain email domains, such as a college address, and can ask custom questions at registration.'],
 ] as const;
 
-// Index cards: each question is a filled card, the topic sits on a tab, and a card opens in place.
-const TONES = ['bg-surface', 'bg-surface-2'];
+// Accordion rows like the reference: a white rounded row, the question on the left, a chevron that turns when it opens.
 export default function Faq() {
   return (
-    <div className="max-w-3xl space-y-3">
+    <div className="mx-auto max-w-3xl space-y-3">
       {ITEMS.map(([topic, q, a], i) => (
-        <details key={q} className="group reveal" {...(i === 0 ? { open: true } : {})}>
-          <summary className="block cursor-pointer list-none marker:content-none [&::-webkit-details-marker]:hidden">
-            <span className={`${TONES[i % 2]} inline-block min-w-28 px-4 py-1.5 text-[0.95rem] font-semibold [clip-path:polygon(0_0,calc(100%-14px)_0,100%_100%,0_100%)]`} style={{ marginLeft: `${(i % 4) * 2}rem` }}>{topic}</span>
-            <span className={`${TONES[i % 2]} block rounded-b-[4px] rounded-tr-[4px] px-5 py-4 text-xl font-medium transition-colors hover:brightness-95 group-open:rounded-b-none`}>{q}</span>
+        <details key={q} className="group rounded-[28px] border-2 border-ink-line bg-card text-card-fg open:bg-surface-2 open:text-[#141414]" {...(i === 0 ? { open: true } : {})}>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 marker:content-none [&::-webkit-details-marker]:hidden">
+            <span><span className="sr-only">{topic}: </span><span className="text-[1.08rem] font-bold leading-snug sm:text-lg">{q}</span></span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 transition-transform group-open:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
           </summary>
-          <p className={`${TONES[i % 2]} max-w-none rounded-b-[4px] px-5 pb-5`}>{a}</p>
+          <p className="max-w-none px-6 pb-6 text-[1.02rem]">{a}</p>
         </details>
       ))}
     </div>

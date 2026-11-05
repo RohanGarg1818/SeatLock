@@ -65,7 +65,7 @@ export default function ChaosLab() {
           </section>
           <section aria-labelledby="tl-h">
             <h2 id="tl-h" className="display text-2xl">What happened</h2>
-            <ol className="mt-3 space-y-1.5 [&>li]:rounded-[4px] [&>li]:bg-surface-2 [&>li]:px-3">
+            <ol className="mt-3 space-y-1.5 [&>li]:rounded-2xl [&>li]:bg-surface-2 [&>li]:px-3">
               {result.timeline.map((t, i) => (
                 <li key={i} className="flex gap-4 p-3"><span className="w-16 shrink-0 text-sm text-muted">{t.at_ms} ms</span><span>{t.detail}</span></li>
               ))}

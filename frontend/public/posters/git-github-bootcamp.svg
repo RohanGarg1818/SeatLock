@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600"><rect width="800" height="600" fill="#fdd4b6"/><defs><pattern id="d" width="36" height="36" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="2.4" fill="#141414" opacity=".35"/></pattern></defs><rect width="800" height="600" fill="url(#d)"/>
+    <rect x="130" y="130" width="540" height="340" rx="20" fill="#ffffff" stroke="#141414" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+    <rect x="130" y="130" width="540" height="54" rx="20" fill="#f4c542" stroke="#141414" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="170" cy="157" r="9" fill="#141414"/><circle cx="200" cy="157" r="9" fill="#141414"/><circle cx="230" cy="157" r="9" fill="#141414"/>
+    <path d="M175 235l40 32-40 32" fill="none" stroke="#e8883a" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M245 300h120" stroke="#141414" stroke-width="12" stroke-linecap="round"/>
+    <path d="M410 240h190M410 288h140M175 360h360M175 405h250" stroke="#da915a" stroke-width="12" stroke-linecap="round"/>
+    <polygon points="716.0,470.0 703.7,484.2 705.3,502.9 687.0,507.2 677.3,523.3 660.0,515.9 642.7,523.3 633.0,507.2 614.7,502.9 616.3,484.2 604.0,470.0 616.3,455.8 614.7,437.1 633.0,432.8 642.7,416.7 660.0,424.1 677.3,416.7 687.0,432.8 705.3,437.1 703.7,455.8" fill="#b9d3a0" stroke="#141414" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><path d="M635 470l18 18 34-38" fill="none" stroke="#141414" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/></svg>

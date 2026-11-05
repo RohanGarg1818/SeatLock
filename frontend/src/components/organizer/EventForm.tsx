@@ -33,10 +33,12 @@ export default function EventForm({ event, locked = false, onSaved }: { event?: 
   const originalIds = useRef(new Set((event?.registration_questions ?? []).map((q) => q.id)));
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => { setF((s) => ({ ...s, [k]: v })); setSaved(false); };
 
-  // The banner uploader only appears when the API says Cloudinary is configured.
+  // The poster uploader is enabled only when the API says Cloudinary is configured.
   useEffect(() => { api<{ cloudinary_enabled: boolean }>('/config').then((c) => setCloudinary(c.cloudinary_enabled)).catch(() => {}); }, []);
 
   async function upload(file: File) {
+    if (!file.type.startsWith('image/')) { setError('Choose an image file (JPG, PNG or WebP).'); return; }
+    if (file.size > 5 * 1024 * 1024) { setError('That image is over 5 MB. Choose a smaller one.'); return; }
     setUploading(true); setError(null);
     try {
       const sig = await api<{ upload_url: string; api_key: string; timestamp: number; folder: string; signature: string }>('/uploads/sign', { method: 'POST', body: {} });
@@ -103,12 +105,13 @@ export default function EventForm({ event, locked = false, onSaved }: { event?: 
       </div>
       <div><label className="label" htmlFor="dom">Allowed email domains <span className="hint font-normal">(optional, comma separated)</span></label><input id="dom" className="field" placeholder="ipu.ac.in, ggsipu.ac.in" value={f.domains} onChange={(e) => set('domains', e.target.value)} {...inv('allowed_email_domains')} /><p className="hint mt-1">Leave empty to allow anyone. Exact match: &quot;ipu.ac.in&quot; does not include subdomains.</p><Err k="allowed_email_domains" /></div>
 
-      {cloudinary && (
+      {(
         <div>
-          <label className="label" htmlFor="banner">Banner image <span className="hint font-normal">(optional)</span></label>
-          <input id="banner" type="file" accept="image/*" className="field" disabled={uploading} onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+          <label className="label" htmlFor="banner">Event poster <span className="hint font-normal">(optional, a portrait or square image works best)</span></label>
+          <input id="banner" type="file" accept="image/*" className="field" disabled={uploading || !cloudinary} onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+          {!cloudinary && <p className="hint mt-1">Poster uploads are switched off on this server. Add the CLOUDINARY_* keys to the API environment to turn them on.</p>}
           {uploading && <p className="hint mt-1">Uploading…</p>}
-          {f.banner_url && <div className="mt-2 flex items-center gap-3">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={f.banner_url} alt="Banner preview" className="h-20 border border-line" /><button type="button" className="btn btn-sm" onClick={() => set('banner_url', '')}>Remove</button></div>}
+          {f.banner_url && <div className="mt-2 flex items-center gap-3">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={f.banner_url} alt="Poster preview" className="h-20 border border-line" /><button type="button" className="btn btn-sm" onClick={() => set('banner_url', '')}>Remove</button></div>}
           <Err k="banner_url" />
         </div>
       )}

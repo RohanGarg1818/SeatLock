@@ -12,6 +12,7 @@
     "backend": "npm --prefix backend run dev",
     "frontend": "npm --prefix frontend run dev",
     "test": "npm --prefix backend test",
-    "build": "npm --prefix frontend run build"
+    "build": "npm --prefix frontend run build",
+    "photos": "node scripts/fetch-photos.mjs"
   }
 }

@@ -35,7 +35,7 @@ export default function StaffPanel({ eventId }: { eventId: string }) {
       </form>
       {error && <p role="alert" className="err mt-2">{error}</p>}
       {staff === null ? <p className="mt-4 text-muted">Loading…</p> : (
-        <ul className="mt-6 space-y-1.5 [&>li]:rounded-[4px] [&>li]:bg-surface-2 [&>li]:px-3">
+        <ul className="mt-6 space-y-1.5 [&>li]:rounded-2xl [&>li]:bg-surface-2 [&>li]:px-3">
           {staff.length === 0 && <li className="py-3 text-muted">No volunteers yet.</li>}
           {staff.map((s) => (
             <li key={s.user_id} className="flex items-center justify-between gap-3 py-3">

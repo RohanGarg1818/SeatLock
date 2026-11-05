@@ -1,6 +1,6 @@
 // Pictures drawn from the subject itself: a hall's seat plan, a hold timer, a waiting line, a ticket's QR code.
 // One flat graphic language, the page's own colours. They are drawings, not photographs, and are labelled as such by being plain.
-const INK = '#2b2622', PAPER = '#f6f2f0', GREEN = '#0f7d45', AMBER = '#c98a14', TAKEN = '#8a807b';
+const INK = '#111111', PAPER = '#f4efe9', GREEN = '#0f7d45', AMBER = '#c98a14', TAKEN = '#8a807b';
 
 /** A seat plan of a hall: rows that curve, mostly taken, a few free, two held. Deterministic, so server and client agree. */
 export function SeatPlan({ className = '', label = 'Seat plan of a hall, mostly taken, a few seats free' }: { className?: string; label?: string }) {

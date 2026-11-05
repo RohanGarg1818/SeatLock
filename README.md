@@ -14,6 +14,55 @@ answer wrong in the safe direction ("sold out" too early) but cannot cause an ov
 - Why each design decision was made: [docs/DESIGN.md](docs/DESIGN.md)
 - Interview preparation (walkthrough, 40 Q&As, pitch, demo script): [INTERVIEW.md](INTERVIEW.md)
 
+## The idea in plain words
+
+College societies run events (hackathons, workshops, talks) with a limited number of seats. The usual tools are a Google Form or a
+spreadsheet, and they break in the same ways: when everyone clicks at 6 pm the form accepts more people than there are seats, the
+same person signs up twice, nobody knows who actually showed up, and cancelled seats are never given to the people waiting.
+
+SeatLock is a registration site where **the seat is a real, counted thing in the database**, and the rules about it are enforced by
+the database itself, not by hope. A student picks an event, gets a seat held for a few minutes while they fill the registration
+form, confirms, and receives a signed QR ticket. At the gate a volunteer scans it with a phone camera and the person is marked
+present. Every step in between (cancel, wait, waitlist, check-in) keeps the same promise: **the number of people holding a seat can
+never be more than the capacity**.
+
+### What is "holding" the seat?
+
+A seat is held by a **row in the `bookings` table with `status = 'HELD'`**, plus a **countdown on that row** (`hold_expires_at`).
+Nothing is held in the browser, in memory or in Redis. Concretely, one click on "Register" does this inside a single database transaction:
+
+1. `UPDATE events SET seats_left = seats_left - 1 WHERE id = ? AND seats_left > 0 AND ...`. The check ("is a seat left?") and the take
+   ("subtract one") are the same statement. Postgres locks the event row for the duration, so if 500 people click at the same instant they
+   are served one by one, and the request that finds `seats_left = 0` matches zero rows and is told "sold out". This is why it cannot oversell.
+2. `INSERT INTO bookings (... status 'HELD', hold_expires_at = now() + hold_minutes ...)`. This row records **who** holds the seat.
+   A unique index allows one active booking per person per event. If the insert fails, the transaction rolls back and the decrement
+   disappears with it, so a seat is never lost either.
+
+The seat then goes one of three ways. The person **confirms** in time (`HELD` becomes `CONFIRMED`, the QR ticket appears). They
+**cancel**, or **let the timer run out**: a background sweeper finds expired holds (`FOR UPDATE SKIP LOCKED`, so several servers never
+fight over a row), marks them `EXPIRED` and gives the seat back, and the first person on the waitlist is offered it. The countdown
+uses the database clock, never the browser's, so a wrong phone clock cannot extend a hold.
+
+So the short answer: *a seat is held by a booking row and its expiry time, and `events.seats_left` is the counter that row paid for.*
+
+### What makes it different (the USP)
+
+- **Correct under a rush, by construction.** One atomic statement plus database constraints and a unique index, not "check, then
+  write" in application code. The repository ships a runnable proof: `npm run race-demo` fires hundreds of simultaneous requests at a
+  naive implementation (it oversells) and at the real one (it books exactly the capacity). The same demo, a **Chaos Lab** with
+  failure injection, and an **integrity checker** that re-derives every counter from the raw rows are available in the organizer portal.
+- **Honest holds instead of a race to the form.** The seat is reserved while the person fills in the registration questions, so
+  nobody completes a long form only to be told it is full; and abandoned holds return to the pool by themselves.
+- **A waitlist that runs itself.** When a seat frees up it is handed to the first person in line inside the same transaction.
+- **Safe to retry.** Every hold carries an `Idempotency-Key`, so a double click or a retry after a flaky network returns the same
+  booking instead of taking a second seat.
+- **Tickets that cannot be forged.** The QR carries only a signed reference (HMAC), the server re-checks the live booking on every scan,
+  and a real ticket works exactly once.
+- **The whole event day, not only sign-up.** Organizers get custom questions, live seats, CSV export, volunteers and an admin above them;
+  volunteers get a desk with a camera scanner and the registration sheet.
+- **Honest about speed.** Redis is only a shortcut in front of Postgres. Turn it off and the answers stay correct, only slower
+  under a rush. Measured and unmeasured numbers are separated in [docs/RESULTS.md](docs/RESULTS.md).
+
 ## Architecture
 
 ```mermaid
@@ -40,8 +89,9 @@ the first person in line inside the same transaction, as a normal hold.
 | Portal | Who | Where | What they do |
 |---|---|---|---|
 | **User** | any signed-up person | `/`, `/e/<slug>`, `/me`, `/me/tickets/<id>` | browse events, register (seat held while they fill the form), join a waitlist, get a QR ticket, cancel |
-| **Organizer** | role `organizer`, own sign-up and login at `/organizer/signup`, `/organizer/login` (an admin may log in there too) | `/organizer`, `/organizer/events/<id>` | create events with custom questions, publish, change capacity, see live seats and waitlist, registrations table, CSV export, add volunteers, activity log, cancel the event |
-| **Scanner** | organizer, admin, or a volunteer added to that event | `/dashboard/events/<id>/checkin` (volunteers) or `/organizer/events/<id>/checkin` (organizers) | scan the QR: shows name, email and every answer, then checks the person in once. "Verify only" mode looks without checking in |
+| **Organizer** | role `organizer`, own sign-up and login at `/organizer/signup`, `/organizer/login` (an admin may log in there too) | `/organizer`, `/organizer/events/<id>` | create events with custom questions, publish, change capacity, see live seats and waitlist, registrations table, CSV export, add volunteers, cancel the event |
+| **Volunteer desk** | a volunteer added to that event (also organizer and admin) | `/dashboard/events/<id>` (an "Open volunteer desk" banner shows on the event page), organizers scan at `/organizer/events/<id>/checkin` | open the camera and scan QR tickets (name, email and answers, checked in once; "Verify only" looks without checking in), see the registered people with their answers, search, and mark someone present by hand |
+| **Account** | anyone logged in | `/account`, `/organizer/account` | click your name in the header: profile, password, theme, and Log out at the end |
 | **Admin** | role `admin` | `/admin` | platform numbers, every organizer's events (with a Manage link), promote/demote users |
 
 **What the QR contains.** The QR holds only a signed reference (booking id, event id, HMAC signature), not the person's data. The
@@ -82,10 +132,12 @@ Open http://localhost:3000. Demo accounts (all use the password `password123`, e
 |---|---|---|
 | admin | `admin@seatlock.dev` / `admin12345` | from `ADMIN_EMAIL` / `ADMIN_PASSWORD` |
 | organizer | `organizer@seatlock.dev` | owns both demo events |
+| demo attendee | `demo@ipu.ac.in` | already has a confirmed ticket (HackIPU) and a seat on hold (Design Sprint) |
+| organizers | `robotics@seatlock.dev`, `culture@seatlock.dev`, `startups@seatlock.dev` | Robotics Club, Cultural Committee, E-Cell |
 | volunteer | `volunteer@seatlock.dev` | can scan tickets for HackIPU and the Rust workshop |
 | students | `asha@ipu.ac.in`, `ravi@ggsipu.ac.in`, `meera@gmail.com` | the Rust workshop only accepts `ipu.ac.in` / `ggsipu.ac.in`, so Meera is refused there |
 
-Demo events: HackIPU 2026 (40 seats), Intro to Rust (25 seats, college emails only), a Design Sprint (online), Open Mic Night, an ML Study Jam (hybrid, college emails only), and a Robotics Demo Day whose registration has not opened yet.
+Demo events (15, each with a drawn poster from `frontend/public/posters`, regenerate with `node scripts/make-posters.mjs`): HackIPU 2026 (40 seats), Intro to Rust (25 seats, college emails only), a Design Sprint (online), Open Mic Night, an ML Study Jam (hybrid, college emails only), and a Robotics Demo Day whose registration has not opened yet.
 
 ### See the race (the 60-second proof)
 
@@ -102,7 +154,7 @@ real one. The naive one books more than 20; the real one books exactly 20. The s
 Tests use a **real** Postgres (never mocked) and real Redis (database 1). The Docker Postgres creates the `seatlock_test` database for you on first start (if you use your own Postgres, create one named `seatlock_test`). Then run:
 
 ```bash
-npm test                                                          # 97 tests, ~30 s (needs Postgres and Redis running)
+npm test                                                          # 103 tests, ~50 s (needs Postgres and Redis running)
 ```
 
 `TEST_DATABASE_URL` must contain "test" in its database name; the suite truncates every table and refuses to run otherwise.
@@ -189,6 +241,10 @@ IDs are returned as strings. "Organizer" means organizer or admin; organizers on
 | `DELETE /events/:id/waitlist` | logged in | 204 | 404 `NOT_ON_WAITLIST` |
 | `GET /me/waitlist` | logged in | 200 my places in line | |
 | `POST /checkin` `{token, event_id?, preview?}` | organizer, admin, or volunteer **of that event** | 200 `{result:"OK" or "VALID", attendee, email, details:[{label,value}], registered_at,...}`; `preview:true` changes nothing | 400 `INVALID_TICKET` / `WRONG_EVENT`, 403 `NOT_STAFF`, 409 `ALREADY_CHECKED_IN` / `BOOKING_CANCELLED` / `NOT_CONFIRMED`, 404 |
+| `GET /staff/events/:id/desk` | organizer, admin, or volunteer of that event | 200 `{event, stats:{confirmed, checked_in}}` | 404 (not staff) |
+| `GET /staff/events/:id/registrations` | same | 200 registered people only, `after`/`limit`/`q` | 404 |
+| `POST /staff/events/:id/registrations/:bookingId/present` | same | 200 marks present by hand | 404, 409 `ALREADY_CHECKED_IN` / `NOT_CONFIRMED` |
+| `PATCH /auth/me`, `POST /auth/password` | logged in | 200 change name / password (also `/organizer/auth/...`) | 401, 422 |
 | `GET /events` | organizer | 200 own events with counts | 401 |
 | `POST /events` | organizer | 201 (slug generated) | 422 |
 | `GET /events/:id` | owner/admin | 200 | 404 |

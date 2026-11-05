@@ -23,20 +23,20 @@ export default function OrgNav({ user, lab }: Props) {
     { href: '/organizer/events/new', label: 'New event' },
     ...(lab ? [{ href: '/organizer/lab', label: 'Race & Chaos Lab' }] : []),
   ] : [];
-  const base = 'rounded-lg px-3 py-2 text-[0.95rem] font-medium text-muted transition-colors hover:bg-surface-2 hover:text-fg';
-  const on = (l: { href: string; exact?: boolean }) => (l.exact ? path === l.href || /^\/organizer\/events\/\d+/.test(path) : path.startsWith(l.href)) ? ' !text-fg bg-surface-2' : '';
+  const base = 'rounded-full px-3 py-2 text-[0.95rem] font-medium text-fg transition-colors hover:bg-bg/70';
+  const on = (l: { href: string; exact?: boolean }) => (l.exact ? path === l.href || /^\/organizer\/events\/\d+/.test(path) : path.startsWith(l.href)) ? ' bg-bg/70 font-bold' : '';
 
   return (
     <>
-      <nav aria-label="Organizer" className="ml-6 hidden items-center gap-1 lg:flex">
+      <nav aria-label="Organizer" className="ml-auto hidden items-center gap-1 lg:flex">
         {links.map((l) => <Link key={l.href} href={l.href} className={base + on(l)}>{l.label}</Link>)}
       </nav>
-      <div className="ml-auto hidden items-center gap-2 lg:flex">
+      <div className="hidden items-center gap-2 lg:flex">
         <a href="/" className={base}>View attendee site</a>
         <ThemeToggle />
         {user ? (
           <>
-            <Link href="/organizer/account" className="ml-1 rounded-[4px] px-3 py-1 text-right leading-tight hover:bg-surface-2" aria-label={`${user.name}: account and settings`}>
+            <Link href="/organizer/account" className="ml-1 rounded-2xl px-3 py-1 text-right leading-tight hover:bg-bg/70" aria-label={`${user.name}: account and settings`}>
               <span className="block text-sm font-semibold">{user.name}</span>{user.organization && <span className="block text-xs text-muted">{user.organization}</span>}
             </Link>
           </>
@@ -55,16 +55,16 @@ export default function OrgNav({ user, lab }: Props) {
         </button>
       </div>
       {open && (
-        <div id="org-menu" className="fixed inset-x-0 bottom-0 top-16 z-30 overflow-y-auto bg-bg px-4 pb-10 pt-4 lg:hidden">
+        <div id="org-menu" className="fixed inset-x-0 bottom-0 top-20 z-30 overflow-y-auto bg-bg px-4 pb-10 pt-4 lg:hidden">
           <nav aria-label="Organizer mobile" className="mx-auto flex max-w-md flex-col">
             {user && (
-              <Link href="/organizer/account" className="mb-3 flex items-center justify-between rounded-[4px] bg-surface-2 p-4">
+              <Link href="/organizer/account" className="mb-3 flex items-center justify-between rounded-3xl border-2 border-ink-line bg-surface-2 p-4">
                 <span><span className="block font-semibold leading-tight">{user.name}</span><span className="block text-sm text-muted">{user.organization ?? 'Organizer'} · Account and settings</span></span>
                 <Icon name="arrow" className="text-muted" />
               </Link>
             )}
-            {links.map((l) => <Link key={l.href} href={l.href} className="mb-2 flex items-center justify-between rounded-[4px] bg-surface-2 px-4 py-4 text-lg font-medium">{l.label}<Icon name="arrow" className="text-muted" /></Link>)}
-            <a href="/" className="mb-2 flex items-center justify-between rounded-[4px] bg-surface-2 px-4 py-4 text-lg font-medium">View attendee site<Icon name="arrow" className="text-muted" /></a>
+            {links.map((l) => <Link key={l.href} href={l.href} className="mb-2 flex items-center justify-between rounded-full border-2 border-ink-line bg-card px-5 py-3.5 text-lg font-bold text-card-fg">{l.label}<Icon name="arrow" className="text-muted" /></Link>)}
+            <a href="/" className="mb-2 flex items-center justify-between rounded-full border-2 border-ink-line bg-card px-5 py-3.5 text-lg font-bold text-card-fg">View attendee site<Icon name="arrow" className="text-muted" /></a>
             <div className="mt-6 grid gap-3">
               {!user && (
                 <>

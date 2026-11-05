@@ -79,7 +79,7 @@ export default function Scanner({ eventId, eventTitle }: { eventId: string; even
       <p className="text-muted">{eventTitle} · <strong className="text-fg">{count}</strong> checked in on this device</p>
 
       {!cameraOn ? (
-        <div className="mt-4 max-w-md rounded-[4px] bg-surface-2 p-6">
+        <div className="mt-4 max-w-md rounded-2xl bg-surface-2 p-6">
           <p className="display text-2xl">Scan attendee tickets</p>
           <p className="mt-2 text-muted">Open the camera and point it at the QR code on the attendee&apos;s phone or printout. A valid ticket is marked present on the registration sheet at once.</p>
           <button type="button" className="btn btn-primary btn-lg mt-5 w-full" onClick={() => { setCamError(null); setCameraOn(true); }}>Open camera</button>
@@ -114,7 +114,7 @@ export default function Scanner({ eventId, eventTitle }: { eventId: string; even
       {recent.length > 0 && (
         <section className="mt-8 max-w-md" aria-label="Marked present on this device">
           <h2 className="display text-2xl">Marked present</h2>
-          <ul className="mt-3 space-y-1.5 [&>li]:rounded-[4px] [&>li]:bg-surface-2 [&>li]:px-3">
+          <ul className="mt-3 space-y-1.5 [&>li]:rounded-2xl [&>li]:bg-surface-2 [&>li]:px-3">
             {recent.map((r, i) => <li key={i} className="flex justify-between gap-4 py-2"><span className="font-medium">{r.name}</span><span className="num text-muted">{r.at.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span></li>)}
           </ul>
         </section>

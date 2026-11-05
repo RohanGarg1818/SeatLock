@@ -66,7 +66,7 @@ export default function EventManager({ initialEvent, initialStats }: { initialEv
       <div role="tablist" aria-label="Event sections" className="mt-6 flex flex-wrap gap-1">
         {TABS.map((t) => (
           <button key={t} role="tab" id={`tab-${t}`} aria-selected={tab === t} aria-controls={`panel-${t}`} onClick={() => setTab(t)}
-            className={`min-h-11 px-4 font-semibold ${tab === t ? 'rounded-[4px] bg-accent text-accent-ink' : 'rounded-[4px] text-muted hover:bg-surface-2 hover:text-fg'}`}>{t}</button>
+            className={`min-h-11 px-5 font-bold ${tab === t ? 'rounded-full border-2 border-ink-line bg-accent text-accent-ink' : 'rounded-full border-2 border-transparent text-muted hover:bg-surface-2 hover:text-fg'}`}>{t}</button>
         ))}
       </div>
 
