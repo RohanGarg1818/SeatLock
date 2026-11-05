@@ -23,8 +23,9 @@ export default function QuestionBuilder({ value, onChange, locked, originalIds }
       {value.map((q, i) => {
         const existing = originalIds.has(q.id);
         const fixed = locked && existing;
+        // key={i}, not the id: the id is derived from the label and changes as you type, which would remount the input and drop focus.
         return (
-          <div key={q.id + i} className="card p-4">
+          <div key={i} className="card p-4">
             <div className="grid gap-3 sm:grid-cols-[1fr_12rem]">
               <div>
                 <label className="label" htmlFor={`ql-${i}`}>Question {i + 1}</label>

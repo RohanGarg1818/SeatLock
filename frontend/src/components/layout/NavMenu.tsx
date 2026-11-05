@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Icon from '@/components/ui/Icon';
 import ThemeToggle from '@/components/ui/ThemeToggle';
-import LogoutButton from '@/components/layout/LogoutButton';
 import { useSession } from '@/lib/session';
 
 const PUBLIC_LINKS = [
@@ -46,8 +45,10 @@ export default function NavMenu() {
         <ThemeToggle />
         {user ? (
           <>
-            <span className="ml-1 grid h-9 w-9 place-items-center rounded-[4px] bg-accent text-sm font-bold text-accent-ink" title={user.name} aria-label={`Signed in as ${user.name}`}>{user.name.trim().charAt(0).toUpperCase()}</span>
-            <LogoutButton className="btn btn-sm btn-ghost" />
+            <Link href="/account" className="ml-1 flex items-center gap-2.5 rounded-[4px] py-1 pl-1 pr-3 hover:bg-surface-2" aria-label={`${user.name}: account and settings`}>
+              <span className="grid h-9 w-9 place-items-center rounded-[4px] bg-accent text-sm font-bold text-accent-ink">{user.name.trim().charAt(0).toUpperCase()}</span>
+              <span className="max-w-[10rem] truncate text-[0.95rem] font-semibold">{user.name}</span>
+            </Link>
           </>
         ) : (
           <>
@@ -68,16 +69,17 @@ export default function NavMenu() {
         <div id="mobile-menu" className="fixed inset-x-0 bottom-0 top-16 z-30 overflow-y-auto bg-bg px-4 pb-10 pt-4 lg:hidden">
           <nav aria-label="Mobile" className="mx-auto flex max-w-md flex-col">
             {user && (
-              <div className="mb-3 flex items-center gap-3 rounded-md border-[1.5px] border-line bg-surface p-4">
+              <Link href="/account" className="mb-3 flex items-center gap-3 rounded-[4px] bg-surface-2 p-4">
                 <span className="grid h-11 w-11 place-items-center rounded-[4px] bg-accent font-bold text-accent-ink">{user.name.trim().charAt(0).toUpperCase()}</span>
-                <div><p className="font-semibold leading-tight">{user.name}</p><p className="text-sm capitalize text-muted">{user.role}</p></div>
-              </div>
+                <div className="min-w-0 flex-1"><p className="truncate font-semibold leading-tight">{user.name}</p><p className="text-sm text-muted">Account and settings</p></div>
+                <Icon name="arrow" className="text-muted" />
+              </Link>
             )}
             {[...account, ...PUBLIC_LINKS, { href: '/organizer/login', label: 'For organizers' }].map((l) => (
               <Link key={l.href} href={l.href} className="mb-2 flex items-center justify-between rounded-[4px] bg-surface-2 px-4 py-4 text-lg font-medium">{l.label}<Icon name="arrow" className="text-muted" /></Link>
             ))}
             <div className="mt-6 grid gap-3">
-              {user ? <LogoutButton className="btn btn-lg w-full" /> : (
+              {!user && (
                 <>
                   <Link className="btn btn-lg btn-primary w-full" href="/register">Sign up free</Link>
                   <Link className="btn btn-lg w-full" href="/login">Log in</Link>

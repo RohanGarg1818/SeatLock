@@ -7,10 +7,9 @@ import type { EventStats, OrganizerEvent } from '@/lib/types';
 import EventForm from '@/components/organizer/EventForm';
 import RegistrationsPanel from '@/components/organizer/RegistrationsPanel';
 import StaffPanel from '@/components/organizer/StaffPanel';
-import AuditPanel from '@/components/organizer/AuditPanel';
 import IntegrityPanel from '@/components/organizer/IntegrityPanel';
 
-const TABS = ['Overview', 'Details', 'Registrations', 'Team', 'Activity'] as const;
+const TABS = ['Overview', 'Details', 'Registrations', 'Team'] as const;
 type Tab = (typeof TABS)[number];
 
 export default function EventManager({ initialEvent, initialStats }: { initialEvent: OrganizerEvent; initialStats: EventStats }) {
@@ -110,7 +109,6 @@ export default function EventManager({ initialEvent, initialStats }: { initialEv
         )}
         {tab === 'Registrations' && <RegistrationsPanel eventId={event.id} questions={event.registration_questions ?? []} />}
         {tab === 'Team' && <StaffPanel eventId={event.id} />}
-        {tab === 'Activity' && <AuditPanel eventId={event.id} />}
       </div>
     </div>
   );

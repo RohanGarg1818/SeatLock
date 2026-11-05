@@ -7,6 +7,7 @@ import type { MyBooking, PublicEvent } from '@/lib/types';
 import EventCover from '@/components/events/EventCover';
 import Markdown from '@/components/ui/Markdown';
 import RegisterPanel from '@/components/events/RegisterPanel';
+import StaffBanner from '@/components/events/StaffBanner';
 import ShareBar from '@/components/ui/ShareBar';
 import Icon from '@/components/ui/Icon';
 import { StateTag } from '@/components/ui/StateTag';
@@ -55,6 +56,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
     <article>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <nav aria-label="Breadcrumb" className="mb-5 text-sm text-muted"><Link href="/#events" className="inline-flex items-center gap-1.5 hover:text-fg"><Icon name="arrow" size={16} className="rotate-180" />All events</Link></nav>
+      <StaffBanner eventId={e.id} />
       <EventCover title={e.title} startsAt={e.starts_at} slug={e.slug} bannerUrl={e.banner_url} />
       {/* On a phone the order is: details, registration, description. On a laptop the registration card sits in a sticky right column. */}
       <div className="mt-10 grid gap-x-10 gap-y-10 pb-24 lg:grid-cols-[1fr_24rem] lg:pb-0">

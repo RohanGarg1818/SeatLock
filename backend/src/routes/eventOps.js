@@ -166,6 +166,64 @@ export default function eventOpsRouter(ctx, { requireAuth, requireOrganizer }) {
     res.status(204).end();
   });
 
+  // ---- Volunteer desk ------------------------------------------------------------------------------
+  // A volunteer of THIS event (or its organizer, or an admin) can see who registered and who is present, and mark
+  // someone present by hand when their QR code will not scan. Read-mostly: nothing here edits the event itself.
+  async function deskEvent(req) {
+    const id = idParam(req.params.id);
+    const { rows } = await pool.query(
+      `SELECT e.id, e.title, e.venue, e.starts_at, e.capacity, e.status, e.registration_questions,
+              (e.organizer_id = $2 OR $3 = 'admin' OR EXISTS (SELECT 1 FROM event_staff s WHERE s.event_id = e.id AND s.user_id = $2)) AS allowed
+         FROM events e WHERE e.id = $1`, [id, req.user.id, req.user.role]);
+    if (!rows[0] || !rows[0].allowed) throw new AppError(404, 'EVENT_NOT_FOUND', 'Event not found.'); // not staff: looks like it does not exist
+    return rows[0];
+  }
+
+  r.get('/staff/events/:id/desk', requireAuth, async (req, res) => {
+    const e = await deskEvent(req);
+    const { rows } = await pool.query(
+      `SELECT count(*) FILTER (WHERE status = 'CONFIRMED')::int AS confirmed,
+              count(*) FILTER (WHERE checked_in_at IS NOT NULL)::int AS checked_in
+         FROM bookings WHERE event_id = $1`, [e.id]);
+    const { allowed, ...event } = e;
+    res.json({ event, stats: rows[0] });
+  });
+
+  r.get('/staff/events/:id/registrations', requireAuth, async (req, res) => {
+    const e = await deskEvent(req);
+    const limit = limitParam(req.query.limit, 50, 200);
+    const after = req.query.after ? idParam(req.query.after, 'cursor') : '0';
+    const q = typeof req.query.q === 'string' && req.query.q.trim() ? likePattern(req.query.q.trim()) : null;
+    const { rows } = await pool.query(
+      `SELECT b.id, b.status, b.answers, b.confirmed_at, b.checked_in_at, b.created_at, u.id AS user_id, u.name, u.email
+         FROM bookings b JOIN users u ON u.id = b.user_id
+        WHERE b.event_id = $1 AND b.id > $2 AND b.status = 'CONFIRMED' AND ($3::text IS NULL OR u.name ILIKE $3 OR u.email ILIKE $3)
+        ORDER BY b.id LIMIT $4`, [e.id, after, q, limit + 1]);
+    const page = rows.slice(0, limit);
+    res.json({ registrations: page, next_cursor: rows.length > limit ? page.at(-1).id : null });
+  });
+
+  // Mark one registered person present without a QR scan (dead phone, torn printout).
+  r.post('/staff/events/:id/registrations/:bookingId/present', requireAuth, async (req, res) => {
+    const e = await deskEvent(req);
+    const bookingId = idParam(req.params.bookingId, 'booking id');
+    const out = await tx(pool, async (c) => {
+      const { rows } = await c.query(
+        `UPDATE bookings SET checked_in_at = now(), checked_in_by = $3
+          WHERE id = $1 AND event_id = $2 AND status = 'CONFIRMED' AND checked_in_at IS NULL RETURNING id, checked_in_at`,
+        [bookingId, e.id, req.user.id]);
+      if (!rows[0]) {
+        const cur = await c.query('SELECT status, checked_in_at FROM bookings WHERE id = $1 AND event_id = $2', [bookingId, e.id]);
+        if (!cur.rows[0]) throw new AppError(404, 'BOOKING_NOT_FOUND', 'Registration not found.');
+        if (cur.rows[0].checked_in_at) throw new AppError(409, 'ALREADY_CHECKED_IN', 'This person is already marked present.');
+        throw new AppError(409, 'NOT_CONFIRMED', 'Only confirmed registrations can be marked present.');
+      }
+      await audit(c, req.user.id, 'checkin.manual', 'event', e.id, { booking_id: bookingId });
+      return rows[0];
+    });
+    res.json({ booking: out });
+  });
+
   // Events where I am a volunteer (any logged-in user), so the scanner page can offer them.
   r.get('/me/staff-events', requireAuth, async (req, res) => {
     const { rows } = await pool.query(

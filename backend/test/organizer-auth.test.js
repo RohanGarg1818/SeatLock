@@ -102,3 +102,28 @@ test('an admin signed in on the WEBSITE can manage every organizer\'s events wit
   const p = await createUser(app, {});
   assert.equal((await app.call('GET', `/events/${ev.id}`, { token: p.token })).status, 401);
 });
+
+test('volunteer desk: only staff of THAT event see who registered; they can mark someone present by hand; account settings work', async () => {
+  const owner = await createUser(app, { role: 'organizer' });
+  const ev = await createEvent(app, owner.id, { title: 'Desk test' });
+  const vol = await createUser(app, {}), other = await createUser(app, {}), guest = await createUser(app, {});
+  await app.pool.query('INSERT INTO event_staff (event_id, user_id) VALUES ($1, $2)', [ev.id, vol.id]);
+  const h = await hold(app, ev.id, guest);
+  const booking = h.body.booking;
+  assert.equal((await app.call('POST', `/bookings/${booking.id}/confirm`, { token: guest.token, body: { answers: {} } })).status, 200);
+
+  assert.equal((await app.call('GET', `/staff/events/${ev.id}/desk`, { token: vol.token })).body.stats.confirmed, 1);
+  const list = await app.call('GET', `/staff/events/${ev.id}/registrations`, { token: vol.token });
+  assert.equal(list.body.registrations.length, 1); assert.equal(list.body.registrations[0].email, guest.email);
+  assert.equal((await app.call('GET', `/staff/events/${ev.id}/registrations`, { token: other.token })).status, 404); // not staff
+  assert.equal((await app.call('PATCH', `/events/${ev.id}`, { token: vol.token, body: { title: 'x' } })).status, 401); // volunteers cannot edit
+
+  const mark = await app.call('POST', `/staff/events/${ev.id}/registrations/${booking.id}/present`, { token: vol.token });
+  assert.equal(mark.status, 200);
+  assert.equal((await app.call('POST', `/staff/events/${ev.id}/registrations/${booking.id}/present`, { token: vol.token })).status, 409);
+  assert.equal((await app.call('GET', `/staff/events/${ev.id}/desk`, { token: vol.token })).body.stats.checked_in, 1);
+
+  // settings: rename, then change password (wrong current password is refused)
+  assert.equal((await app.call('PATCH', '/auth/me', { token: guest.token, body: { name: 'New Name' } })).body.user.name, 'New Name');
+  assert.equal((await app.call('POST', '/auth/password', { token: guest.token, body: { current_password: 'wrong', new_password: 'a brand new password' } })).status, 401);
+});

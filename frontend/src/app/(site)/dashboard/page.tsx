@@ -26,7 +26,7 @@ export default async function VolunteerHome() {
           {staffEvents.map((e) => (
             <li key={e.id} className="card flex flex-wrap items-center justify-between gap-3 p-4">
               <div><p className="display text-xl">{e.title}</p><p className="text-sm text-muted">{fmtDateTime(e.starts_at)} · {e.venue}</p></div>
-              <Link className="btn btn-sm btn-primary" href={`/dashboard/events/${e.id}/checkin`}><Icon name="scan" size={16} />Open scanner</Link>
+              <Link className="btn btn-sm btn-primary" href={`/dashboard/events/${e.id}`}><Icon name="scan" size={16} />Open desk</Link>
             </li>
           ))}
         </ul>

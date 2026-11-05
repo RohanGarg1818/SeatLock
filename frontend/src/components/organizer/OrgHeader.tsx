@@ -1,12 +1,12 @@
 import Link from 'next/link';
-import { getOrganizer, serverFetch } from '@/lib/server';
+import { getOrganizer, publicFetch } from '@/lib/server';
 import OrgNav from '@/components/organizer/OrgNav';
 import { Logo } from '@/components/ui/Icon';
 
 // Header of the organizer portal. It is a different product surface from the attendee site: its own brand line,
 // its own navigation, and it only ever shows the organizer session.
 export default async function OrgHeader() {
-  const [user, cfg] = await Promise.all([getOrganizer(), serverFetch<{ demo_enabled: boolean }>('/config')]);
+  const [user, cfg] = await Promise.all([getOrganizer(), publicFetch<{ demo_enabled: boolean }>('/config', 300)]);
   return (
     <header className="sticky top-0 z-40 bg-surface">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">

@@ -423,7 +423,7 @@ Four levels, each able to do everything the level below can:
 |---|---|---|
 | Admin | the whole platform | everything below, on every event: edit details and capacity, publish or cancel, see registrations, manage volunteers, scan, and change user roles. An admin signed in on the website needs no separate organizer login; the portal API accepts their website session. |
 | Organizer | their own events | create and edit events, see registrations, add or remove volunteers, scan |
-| Volunteer | one event (`event_staff`) | scan tickets for that event only |
+| Volunteer | one event (`event_staff`) | open the event's volunteer desk (`/dashboard/events/:id`): scan tickets with the camera, see the registered people and their answers, and mark someone present by hand (`/staff/events/:id/desk`, `/registrations`, `/registrations/:bookingId/present`). Cannot edit the event, see cancelled or held rows, or export CSV. |
 | Attendee | their own bookings | register, cancel, hold a waitlist place |
 
 Only admins cross between the two sessions. An organizer or participant holding only a website token still gets 401 from the portal API (`test/organizer-auth.test.js`).

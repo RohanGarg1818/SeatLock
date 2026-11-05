@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import SlowServerNotice from '@/components/ui/SlowServerNotice';
+import Warmup from '@/components/ui/Warmup';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:border-2 focus:border-[var(--ink-line)] focus:bg-surface focus:p-3">Skip to content</a>
         {children}
         <SlowServerNotice />
+        <Warmup />
       </body>
     </html>
   );

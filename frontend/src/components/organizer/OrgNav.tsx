@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Icon from '@/components/ui/Icon';
 import ThemeToggle from '@/components/ui/ThemeToggle';
-import LogoutButton from '@/components/layout/LogoutButton';
 
 interface Props { user: { name: string; organization: string | null; admin?: boolean } | null; lab: boolean }
 
@@ -37,8 +36,9 @@ export default function OrgNav({ user, lab }: Props) {
         <ThemeToggle />
         {user ? (
           <>
-            <span className="ml-1 text-right leading-tight"><span className="block text-sm font-semibold">{user.name}</span>{user.organization && <span className="block text-xs text-muted">{user.organization}</span>}</span>
-            <LogoutButton portal="organizer" admin={user.admin} className="btn btn-sm btn-ghost" />
+            <Link href="/organizer/account" className="ml-1 rounded-[4px] px-3 py-1 text-right leading-tight hover:bg-surface-2" aria-label={`${user.name}: account and settings`}>
+              <span className="block text-sm font-semibold">{user.name}</span>{user.organization && <span className="block text-xs text-muted">{user.organization}</span>}
+            </Link>
           </>
         ) : (
           <>
@@ -58,15 +58,15 @@ export default function OrgNav({ user, lab }: Props) {
         <div id="org-menu" className="fixed inset-x-0 bottom-0 top-16 z-30 overflow-y-auto bg-bg px-4 pb-10 pt-4 lg:hidden">
           <nav aria-label="Organizer mobile" className="mx-auto flex max-w-md flex-col">
             {user && (
-              <div className="mb-3 rounded-md border-[1.5px] border-line bg-surface p-4">
-                <p className="font-semibold leading-tight">{user.name}</p>
-                <p className="text-sm text-muted">{user.organization ?? 'Organizer'}</p>
-              </div>
+              <Link href="/organizer/account" className="mb-3 flex items-center justify-between rounded-[4px] bg-surface-2 p-4">
+                <span><span className="block font-semibold leading-tight">{user.name}</span><span className="block text-sm text-muted">{user.organization ?? 'Organizer'} · Account and settings</span></span>
+                <Icon name="arrow" className="text-muted" />
+              </Link>
             )}
             {links.map((l) => <Link key={l.href} href={l.href} className="mb-2 flex items-center justify-between rounded-[4px] bg-surface-2 px-4 py-4 text-lg font-medium">{l.label}<Icon name="arrow" className="text-muted" /></Link>)}
             <a href="/" className="mb-2 flex items-center justify-between rounded-[4px] bg-surface-2 px-4 py-4 text-lg font-medium">View attendee site<Icon name="arrow" className="text-muted" /></a>
             <div className="mt-6 grid gap-3">
-              {user ? <LogoutButton portal="organizer" admin={user.admin} className="btn btn-lg w-full" /> : (
+              {!user && (
                 <>
                   <Link className="btn btn-lg btn-primary w-full" href="/organizer/signup">Sign up</Link>
                   <Link className="btn btn-lg w-full" href="/organizer/login">Log in</Link>

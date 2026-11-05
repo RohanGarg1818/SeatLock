@@ -84,5 +84,32 @@ export default function authRouter(ctx, { requireAuth, requireOrganizer }) {
   });
 
   r.get('/organizer/auth/me', requireOrganizer, (req, res) => res.json({ user: publicUser(req.user) }));
+
+  // ---- Account settings (both portals): change your own name and password ------------------------------
+  const nameSchema = z.object({ name: z.string().trim().min(1).max(100) });
+  const orgSettingsSchema = nameSchema.extend({ organization: z.string().trim().min(1).max(120).optional() });
+  const passwordChangeSchema = z.object({ current_password: z.string().min(1).max(200), new_password: passwordSchema });
+
+  async function changePassword(req) {
+    const { current_password, new_password } = parse(passwordChangeSchema, req.body);
+    const { rows } = await pool.query('SELECT password_hash FROM users WHERE id = $1', [req.user.id]);
+    if (!(await bcrypt.compare(current_password, rows[0].password_hash))) throw new AppError(401, 'INVALID_CREDENTIALS', 'Your current password is wrong.');
+    await pool.query('UPDATE users SET password_hash = $2 WHERE id = $1', [req.user.id, await bcrypt.hash(new_password, config.bcryptCost)]);
+  }
+
+  r.patch('/auth/me', requireAuth, async (req, res) => {
+    const { name } = parse(nameSchema, req.body);
+    const { rows } = await pool.query('UPDATE users SET name = $2 WHERE id = $1 RETURNING id, name, email, role, organization', [req.user.id, name]);
+    res.json({ user: publicUser(rows[0]) });
+  });
+  r.post('/auth/password', requireAuth, limit, async (req, res) => { await changePassword(req); res.json({ ok: true }); });
+
+  r.patch('/organizer/auth/me', requireOrganizer, async (req, res) => {
+    const { name, organization } = parse(orgSettingsSchema, req.body);
+    if (!organization && req.user.role !== 'admin') throw new AppError(422, 'VALIDATION_FAILED', 'Some fields are invalid.', { fields: { organization: 'Tell us which society or club you run' } });
+    const { rows } = await pool.query('UPDATE users SET name = $2, organization = COALESCE($3, organization) WHERE id = $1 RETURNING id, name, email, role, organization', [req.user.id, name, organization ?? null]);
+    res.json({ user: publicUser(rows[0]) });
+  });
+  r.post('/organizer/auth/password', requireOrganizer, limit, async (req, res) => { await changePassword(req); res.json({ ok: true }); });
   return r;
 }
