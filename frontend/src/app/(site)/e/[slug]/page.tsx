@@ -94,7 +94,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
 
       {/* Phone: a bar pinned to the bottom so the action is always one tap away. */}
       {e.registration_state === 'OPEN' && !my_booking && (
-        <div className="fixed inset-x-3 bottom-3 z-30 rounded-full border-2 border-ink-line bg-surface-2 px-5 py-2.5 lg:hidden">
+        <div className="fixed inset-x-3 bottom-3 z-30 glass rounded-full px-5 py-2.5 lg:hidden">
           <div className="mx-auto flex max-w-md items-center justify-between gap-4">
             <p className="text-sm leading-tight"><b className="value text-xl">{e.seats_left}</b><span className="text-muted"> seats left</span></p>
             <a href="#register" className="btn btn-primary btn-sm">Register</a>

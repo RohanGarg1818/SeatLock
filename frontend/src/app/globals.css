@@ -203,3 +203,14 @@ textarea.field { min-height: 6rem; }
 
 /* Hide scrollbars on the horizontal filter strip on phones. */
 .no-scrollbar { scrollbar-width: none; } .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Glassmorphism: frosted, translucent panels that blur whatever passes behind them (the lanyards slide under the header). */
+.glass { background: linear-gradient(135deg, rgba(255,255,255,.55), rgba(253,212,182,.35)); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 10px 34px -12px rgba(150,80,20,.4), inset 0 1px 0 rgba(255,255,255,.85); }
+:root[data-theme="dark"] .glass { background: linear-gradient(135deg, rgba(255,241,232,.12), rgba(232,136,58,.12)); border-color: rgba(255,241,232,.22); box-shadow: 0 10px 34px -12px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,241,232,.25); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .glass { background: linear-gradient(135deg, rgba(255,241,232,.12), rgba(232,136,58,.12)); border-color: rgba(255,241,232,.22); box-shadow: 0 10px 34px -12px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,241,232,.25); } }
+
+/* Lanyard strap: woven orange band with black edges and a stitched centre line. */
+.strap { background: repeating-linear-gradient(180deg, transparent 0 9px, rgba(20,20,20,.28) 9px 12px) center / 2px 100% no-repeat, linear-gradient(90deg, #d9742a, #e8883a 40%, #f09a4e 60%, #d9742a); border-inline: 2px solid #141414; }
+/* ID card with a glossy sheen */
+.id-card { position: relative; border: 2px solid #141414; border-radius: 26px; box-shadow: 0 18px 30px -14px rgba(90,40,5,.45); overflow: hidden; }
+.id-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 32%, rgba(255,255,255,0) 68%, rgba(255,255,255,.22) 100%); }

@@ -6,7 +6,7 @@ import ThemeToggle from '@/components/ui/ThemeToggle';
 export default function OrgAuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <header className="mx-auto mt-3 flex h-16 max-w-6xl items-center justify-between rounded-full bg-[linear-gradient(90deg,var(--surface),var(--surface-2))] px-5 sm:px-6">
+      <header className="mx-auto mt-3 flex h-16 max-w-6xl items-center justify-between glass rounded-full px-5 sm:px-6">
         <Link href="/organizer/login" className="flex items-center gap-2.5" aria-label="Organizer portal">
           <Logo /><span className="display text-[1.5rem] italic leading-none">SeatLock</span><span className="tag !bg-accent !text-accent-ink">Organizer</span>
         </Link>

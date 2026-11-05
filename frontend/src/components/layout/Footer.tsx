@@ -6,7 +6,7 @@ const LINKS: [string, string][] = [['Events', '/#events'], ['Pricing', '/#pricin
 export default function Footer() {
   return (
     <footer className="mt-24 px-3 pb-3 sm:px-6">
-      <div className="mx-auto max-w-6xl rounded-[36px] bg-[linear-gradient(90deg,var(--surface),var(--surface-2))] px-6 py-10 sm:px-10">
+      <div className="mx-auto max-w-6xl glass rounded-[36px] px-6 py-10 sm:px-10">
         <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
           <div>
             <Link href="/" className="flex items-center gap-2.5" aria-label="SeatLock home"><Logo size={38} /><span className="display text-[1.8rem] italic leading-none">SeatLock</span></Link>
