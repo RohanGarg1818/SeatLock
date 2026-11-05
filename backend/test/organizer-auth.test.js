@@ -80,3 +80,25 @@ test('gate scanning works from both portals (volunteer on the website, organizer
   const out2 = await fetch(app.base + '/auth/logout', { method: 'POST' });
   assert.match(out2.headers.get('set-cookie'), /^seatlock_token=;/);
 });
+
+test('an admin signed in on the WEBSITE can manage every organizer\'s events without an organizer login; nobody else can cross over', async () => {
+  const owner = await createUser(app, { role: 'organizer' });
+  const ev = await createEvent(app, owner.id, { title: 'Owned by someone else' });
+  const admin = await createUser(app, { role: 'admin' });          // admin.token is a website (attendee-audience) token
+  const { signToken } = await import('../src/middleware/auth.js');
+
+  // read, edit details, change capacity: all with the website session
+  assert.equal((await app.call('GET', `/events/${ev.id}`, { token: admin.token })).status, 200);
+  const patch = await app.call('PATCH', `/events/${ev.id}`, { token: admin.token, body: { title: 'Renamed by the admin', venue: 'Main Hall' } });
+  assert.equal(patch.status, 200); assert.equal(patch.body.event.title, 'Renamed by the admin');
+  assert.equal((await app.call('GET', `/events/${ev.id}/registrations`, { token: admin.token })).status, 200);
+  assert.equal((await app.call('GET', '/organizer/auth/me', { token: admin.token })).body.user.role, 'admin');
+  assert.equal((await app.call('GET', '/events?all=true', { token: admin.token })).body.events.some((e) => e.id === ev.id), true);
+
+  // an organizer or participant holding only a website token still gets nothing from the portal API
+  const org2 = await createUser(app, { role: 'organizer' });
+  const siteTokenOfOrganizer = signToken(app.config, org2, 'attendee');
+  assert.equal((await app.call('GET', `/events/${ev.id}`, { token: siteTokenOfOrganizer })).status, 401);
+  const p = await createUser(app, {});
+  assert.equal((await app.call('GET', `/events/${ev.id}`, { token: p.token })).status, 401);
+});

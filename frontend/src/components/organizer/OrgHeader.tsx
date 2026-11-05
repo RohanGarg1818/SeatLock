@@ -15,7 +15,7 @@ export default async function OrgHeader() {
           <span className="display text-[1.6rem] leading-none">SeatLock</span>
           <span className="tag">Organizer</span>
         </Link>
-        <OrgNav user={user ? { name: user.name, organization: user.organization ?? null } : null} lab={!!cfg.data?.demo_enabled} />
+        <OrgNav user={user ? { name: user.name, organization: user.role === 'admin' ? 'Platform admin' : user.organization ?? null, admin: user.role === 'admin' } : null} lab={!!cfg.data?.demo_enabled} />
       </div>
     </header>
   );

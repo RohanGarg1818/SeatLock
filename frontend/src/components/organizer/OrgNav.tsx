@@ -6,7 +6,7 @@ import Icon from '@/components/ui/Icon';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import LogoutButton from '@/components/layout/LogoutButton';
 
-interface Props { user: { name: string; organization: string | null } | null; lab: boolean }
+interface Props { user: { name: string; organization: string | null; admin?: boolean } | null; lab: boolean }
 
 export default function OrgNav({ user, lab }: Props) {
   const [open, setOpen] = useState(false);
@@ -38,7 +38,7 @@ export default function OrgNav({ user, lab }: Props) {
         {user ? (
           <>
             <span className="ml-1 text-right leading-tight"><span className="block text-sm font-semibold">{user.name}</span>{user.organization && <span className="block text-xs text-muted">{user.organization}</span>}</span>
-            <LogoutButton portal="organizer" className="btn btn-sm btn-ghost" />
+            <LogoutButton portal="organizer" admin={user.admin} className="btn btn-sm btn-ghost" />
           </>
         ) : (
           <>
@@ -66,7 +66,7 @@ export default function OrgNav({ user, lab }: Props) {
             {links.map((l) => <Link key={l.href} href={l.href} className="mb-2 flex items-center justify-between rounded-[4px] bg-surface-2 px-4 py-4 text-lg font-medium">{l.label}<Icon name="arrow" className="text-muted" /></Link>)}
             <a href="/" className="mb-2 flex items-center justify-between rounded-[4px] bg-surface-2 px-4 py-4 text-lg font-medium">View attendee site<Icon name="arrow" className="text-muted" /></a>
             <div className="mt-6 grid gap-3">
-              {user ? <LogoutButton portal="organizer" className="btn btn-lg w-full" /> : (
+              {user ? <LogoutButton portal="organizer" admin={user.admin} className="btn btn-lg w-full" /> : (
                 <>
                   <Link className="btn btn-lg btn-primary w-full" href="/organizer/signup">Sign up</Link>
                   <Link className="btn btn-lg w-full" href="/organizer/login">Log in</Link>

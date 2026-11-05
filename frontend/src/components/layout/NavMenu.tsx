@@ -29,7 +29,7 @@ export default function NavMenu() {
   const account = user ? [
     { href: '/me', label: 'My tickets' },
     ...(volunteers ? [{ href: '/dashboard', label: 'Gate scanner' }] : []),
-    ...(user.role === 'admin' ? [{ href: '/admin', label: 'Admin' }] : []),
+    ...(user.role === 'admin' ? [{ href: '/admin', label: 'Admin' }, { href: '/organizer', label: 'Manage events' }] : []),
   ] : [];
   const link = 'rounded-lg px-3 py-2 text-[0.95rem] font-medium text-muted transition-colors hover:bg-surface-2 hover:text-fg';
   const active = (href: string) => (path === href || (href !== '/' && path.startsWith(href)) ? ' !text-fg bg-surface-2' : '');

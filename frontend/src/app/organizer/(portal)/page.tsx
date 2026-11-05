@@ -8,14 +8,16 @@ export const metadata = { title: 'My events' };
 
 export default async function OrganizerHome() {
   const user = (await getOrganizer())!;
-  const { data } = await serverFetch<{ events: OrganizerEvent[] }>('/events');
+  const admin = user.role === 'admin';
+  // An admin sees and manages every organizer's events; an organizer sees their own.
+  const { data } = await serverFetch<{ events: OrganizerEvent[] }>(admin ? '/events?all=true' : '/events');
   const events = data?.events ?? [];
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="display text-5xl sm:text-6xl">{user.organization ?? 'Your events'}</h1>
-          <p className="mt-2 text-lg text-muted">Welcome, {user.name.split(' ')[0]}</p>
+          <h1 className="display text-5xl sm:text-6xl">{admin ? 'All events' : user.organization ?? 'Your events'}</h1>
+          <p className="mt-2 text-lg text-muted">Welcome, {user.name.split(' ')[0]}{admin && ', you can manage every event on the platform'}</p>
         </div>
         <Link className="btn btn-primary" href="/organizer/events/new"><Icon name="plus" size={16} />New event</Link>
       </div>

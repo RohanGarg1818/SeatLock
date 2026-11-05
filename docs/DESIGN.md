@@ -415,6 +415,19 @@ Attendees and organizers are different people doing different jobs, so they get 
 - **Frontend.** Next.js route groups: `(site)` has the attendee header and footer, `organizer/(auth)` is a bare login page, `organizer/(portal)` has its own header and redirects to the portal login when there is no organizer session.
 - Covered by `test/organizer-auth.test.js` (6 tests) and the browser script `e2e3` (26 checks).
 
+### Who can do what
+
+Four levels, each able to do everything the level below can:
+
+| Level | Scope | Can |
+|---|---|---|
+| Admin | the whole platform | everything below, on every event: edit details and capacity, publish or cancel, see registrations, manage volunteers, scan, and change user roles. An admin signed in on the website needs no separate organizer login; the portal API accepts their website session. |
+| Organizer | their own events | create and edit events, see registrations, add or remove volunteers, scan |
+| Volunteer | one event (`event_staff`) | scan tickets for that event only |
+| Attendee | their own bookings | register, cancel, hold a waitlist place |
+
+Only admins cross between the two sessions. An organizer or participant holding only a website token still gets 401 from the portal API (`test/organizer-auth.test.js`).
+
 ## 26. Other decisions
 
 - **Graceful shutdown** (`server.js`): on SIGTERM stop the sweeper, stop accepting connections, wait for in-flight requests, then close Redis and the pool (a deploy must not cut a booking in half).

@@ -86,7 +86,22 @@ export function authMiddleware(ctx) {
       next();
     },
     requireAuth: guard(ATTENDEE), // the website: participants, volunteers and admins
-    requireOrganizer: guard(ORGANIZER, 'organizer', 'admin'), // the organizer portal
+    // The organizer portal. Organizers use their own session; an ADMIN signed in on the website may manage everything
+    // too (every event, its details, registrations, volunteers) without a separate organizer login.
+    async requireOrganizer(req, res, next) {
+      let found = await identify(req, ORGANIZER);
+      if (!found.user) {
+        const site = await identify(req, ATTENDEE);
+        if (site.user?.role === 'admin') found = site; // only admins cross over; a participant or organizer site session never does
+      }
+      const { user, viaCookie } = found;
+      if (!user) throw new AppError(401, 'UNAUTHENTICATED', 'Please log in.');
+      if (user.role !== 'organizer' && user.role !== 'admin') throw new AppError(403, 'FORBIDDEN', 'You do not have permission to do that.');
+      checkOrigin(req, viaCookie);
+      req.user = user;
+      req.portal = ORGANIZER;
+      next();
+    },
     // Gate scanning is done from both places: volunteers on the website, organizers in their portal.
     async requireEither(req, res, next) {
       for (const aud of [ATTENDEE, ORGANIZER]) {
