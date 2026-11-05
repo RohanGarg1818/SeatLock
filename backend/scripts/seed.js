@@ -110,8 +110,12 @@ async function seedDemo() {
     { name: 'Asha Sharma', email: 'asha@ipu.ac.in' },
     { name: 'Ravi Verma', email: 'ravi@ggsipu.ac.in' },
     { name: 'Meera Iyer', email: 'meera@gmail.com' }, // a gmail address: NOT eligible for university-only events
+    { name: 'Demo Student', email: 'demo@ipu.ac.in' }, // has a ticket and a held seat already, so /me looks lived-in
+    { name: 'Isha Nair', email: 'startups@seatlock.dev', role: 'organizer', organization: 'E-Cell, USICT' },
   ], hash);
   const [coding, robotics, culture, volunteer] = ['organizer@seatlock.dev', 'robotics@seatlock.dev', 'culture@seatlock.dev', 'volunteer@seatlock.dev'].map((e) => people.get(e));
+  const ecell = people.get('startups@seatlock.dev');
+  const demoStudent = people.get('demo@ipu.ac.in');
 
   // A few dozen students who fill the events. (The named demo accounts above are left free for trying the flow by hand.)
   const roster = [];
@@ -138,6 +142,30 @@ async function seedDemo() {
     { organizer: robotics, slug: 'robotics-demo-day', title: 'Robotics Demo Day', tagline: 'See what the club built this semester.', venue: 'Workshop Hall, Block C', mode: 'offline',
       day: 24, hour: 10, hours: 5, capacity: 80, opensSql: `now() + interval '72 hours'`,
       description: `Live demos from every robotics project, followed by a Q&A with the builders.\n\n**Registration opens in a few days.**` },
+    { organizer: ecell, slug: 'startup-pitch-night', title: 'Startup Pitch Night', tagline: 'Five minutes, one deck, three founders on the panel.', venue: 'Seminar Hall, Block A', mode: 'offline',
+      day: 6, hour: 17, hours: 3, capacity: 50, fill: 46, volunteers: true,
+      description: `Student founders pitch to a panel of alumni who have built and sold companies.\n\n- 5 minute pitch, 3 minute questions\n- Best pitch wins a **mentorship week**\n- Networking snacks after` },
+    { organizer: culture, slug: 'photo-walk', title: 'Campus Photo Walk', tagline: 'Golden hour, one camera (or phone), a dozen new friends.', venue: 'Meets at the Main Gate', mode: 'offline',
+      day: 8, hour: 16, hours: 3, capacity: 30, fill: 14,
+      description: `A relaxed walk around campus with a few tips on **light and framing** from the photography society.\n\nPhones are welcome. Best photos get printed for the Open Mic night wall.` },
+    { organizer: ecell, slug: 'quiz-league', title: 'Inter-College Quiz League', tagline: 'Teams of three. Tech, pop culture and general knowledge.', venue: 'Lecture Theatre 2', mode: 'offline',
+      day: 12, hour: 14, hours: 3, capacity: 24, fill: 24, waitlist: 3, questions: QUESTIONS,
+      description: `Eight rounds, one buzzer, and bragging rights for the year.\n\n**This one is full; join the waitlist and you will get a seat if someone drops out.**` },
+    { organizer: coding, slug: 'cyber-ctf', title: 'Capture the Flag: Cyber Security CTF', tagline: 'Break things, legally. Web, crypto and forensics puzzles.', venue: 'Computer Centre', mode: 'hybrid',
+      day: 14, hour: 9, hours: 8, capacity: 45, domains: UNIVERSITY, fill: 19, volunteers: true, questions: QUESTIONS,
+      description: `A beginner-friendly **CTF** with challenges for every level.\n\n- Teams of 1-3\n- Starter hints at the kick-off\n- Open to students with a university email address` },
+    { organizer: ecell, slug: 'career-fair', title: 'Campus Career Fair', tagline: '20 companies, internships and full-time roles.', venue: 'Convention Centre', mode: 'offline',
+      day: 20, hour: 10, hours: 7, capacity: 200, fill: 83,
+      description: `Meet recruiters from **20+ companies**. Bring printed resumes and a smile.\n\nWalk-ins are limited: register to skip the queue.` },
+    { organizer: culture, slug: 'dance-fest', title: 'Dance Fest: Rhythm & Moves', tagline: 'Solo, duet and crew battles. Come perform or cheer.', venue: 'Open Air Theatre', mode: 'offline',
+      day: 18, hour: 17, hours: 4, capacity: 150, fill: 62,
+      description: `Three stages, one night. Registration is for **audience seats**; performers sign up with the cultural committee.` },
+    { organizer: ecell, slug: 'pm-101-talk', title: 'Product Management 101 (Guest Talk)', tagline: 'How a PM at a unicorn decides what to build next.', venue: 'Online (link sent after you register)', mode: 'online',
+      day: 5, hour: 19, hours: 2, capacity: 300, fill: 118,
+      description: `An hour of talk and an hour of questions with a product manager from a leading startup.\n\nThe link and a calendar file arrive as soon as you confirm.` },
+    { organizer: coding, slug: 'web3-workshop', title: 'Web Dev Bootcamp: Build and Ship', tagline: 'Zero to a deployed site in one afternoon.', venue: 'Lab 2, USICT', mode: 'offline',
+      day: 3, hour: 14, hours: 4, capacity: 36, fill: 33, volunteers: true,
+      description: `Bring a laptop. You will leave with a **live website** on the internet.\n\nNo experience needed.` },
   ];
 
   for (const e of events) {
@@ -148,14 +176,27 @@ async function seedDemo() {
     if (e.volunteers) await pool.query('INSERT INTO event_staff (event_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [id, volunteer.id]);
   }
 
+  // The demo student already has one confirmed ticket and one seat on hold, so the "My tickets" page has something to show.
+  for (const [slug, confirm] of [['hackipu-2026', true], ['design-sprint', false]]) {
+    const ev = await pool.query('SELECT id FROM events WHERE slug = $1', [slug]);
+    if (!ev.rows[0] || !demoStudent) continue;
+    const have = await pool.query('SELECT 1 FROM bookings WHERE event_id = $1 AND user_id = $2', [ev.rows[0].id, demoStudent.id]);
+    if (have.rows[0]) continue;
+    try {
+      const { booking } = await holdSeat(ctx, { eventId: String(ev.rows[0].id), user: demoStudent, key: `seed-demo-${slug}` });
+      if (confirm) await confirmBooking(ctx, { bookingId: booking.id, user: demoStudent, answers: answersFor(QUESTIONS, 1) });
+    } catch (err) { console.log(`  (demo student could not book ${slug}: ${err.message})`); }
+  }
+
   // A finished event, so the organizer dashboard has history. It ended in the past, so the website's own rules would
   // (rightly) refuse new registrations: its bookings are written directly, in ONE transaction, with seats_left
   // derived from them, and every attendee who showed up is checked in by the volunteer.
   const past = await insertPastEvent(coding, volunteer, students);
   console.log(`demo programme ready${past ? '' : ' (already present)'}. All demo accounts use the password: ${PASSWORD}`);
   console.log('  admin      ' + config.adminEmail + ' / ' + (config.adminPassword || '(your ADMIN_PASSWORD)'));
-  console.log('  organizers organizer@seatlock.dev (Coding Society), robotics@seatlock.dev, culture@seatlock.dev');
+  console.log('  organizers organizer@seatlock.dev (Coding Society), robotics@seatlock.dev, culture@seatlock.dev, startups@seatlock.dev (E-Cell)');
   console.log('  volunteer  volunteer@seatlock.dev (scans at HackIPU and the Rust workshop)');
+  console.log('  demo       demo@ipu.ac.in (has a ticket and a held seat)');
   console.log('  students   asha@ipu.ac.in, ravi@ggsipu.ac.in, meera@gmail.com (gmail is NOT eligible for university-only events)');
 }
 
