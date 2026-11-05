@@ -11,7 +11,7 @@ export default function uploadsRouter(ctx, { requireOrganizer }) {
   r.post('/uploads/sign', requireOrganizer, (req, res) => {
     if (!config.cloudinary) throw new AppError(404, 'FEATURE_DISABLED', 'Image uploads are not configured.');
     const { cloudName, apiKey, apiSecret } = config.cloudinary;
-    const params = { folder: 'seatlock/banners', timestamp: Math.floor(Date.now() / 1000) };
+    const params = { folder: 'seatlock/posters', timestamp: Math.floor(Date.now() / 1000) };
     // Cloudinary signature = SHA-1 of "k1=v1&k2=v2" (keys sorted) immediately followed by the API secret.
     const toSign = Object.keys(params).sort().map((k) => `${k}=${params[k]}`).join('&');
     const signature = createHash('sha1').update(toSign + apiSecret).digest('hex');
