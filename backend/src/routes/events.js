@@ -28,7 +28,8 @@ const fields = {
   // [] and null both mean "anyone may register".
   allowed_email_domains: z.array(domain).max(10).nullable().transform((d) => (d && d.length ? d : null)),
   registration_questions: questionsSchema,
-  banner_url: z.url({ protocol: /^https$/ }).max(500).nullable(), // https only: blocks javascript: URLs
+  // https only (blocks javascript: URLs), or a poster this API stored itself (/api/uploads/<uuid>).
+  banner_url: z.union([z.url({ protocol: /^https$/ }).max(500), z.string().regex(/^\/api\/uploads\/[0-9a-f-]{36}$/, 'Invalid poster link')]).nullable(),
 };
 
 const orderChecks = (v, ctx) => {

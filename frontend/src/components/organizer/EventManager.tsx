@@ -8,6 +8,8 @@ import EventForm from '@/components/organizer/EventForm';
 import RegistrationsPanel from '@/components/organizer/RegistrationsPanel';
 import StaffPanel from '@/components/organizer/StaffPanel';
 import IntegrityPanel from '@/components/organizer/IntegrityPanel';
+import Snapshot from '@/components/ui/Snapshot';
+import { kindOf, posterFor } from '@/lib/kind';
 
 const TABS = ['Overview', 'Details', 'Registrations', 'Team'] as const;
 type Tab = (typeof TABS)[number];
@@ -55,10 +57,13 @@ export default function EventManager({ initialEvent, initialStats }: { initialEv
   return (
     <div className="mt-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="flex items-center gap-4">
+          <span className="hidden w-28 shrink-0 sm:block"><Snapshot src={posterFor(event)} kind={kindOf(event.title)} alt={`Poster for ${event.title}`} className="!rounded-2xl" /></span>
+          <div>
           <h1 className="display text-4xl">{event.title}</h1>
           <p className="mt-1 flex flex-wrap items-center gap-3 text-muted"><span className="tag">{event.status}</span>
             {event.status !== 'DRAFT' && <Link className="underline underline-offset-4" href={`/e/${event.slug}`}>Public page</Link>}</p>
+          </div>
         </div>
         {event.status === 'PUBLISHED' && <Link className="btn btn-primary" href={`/organizer/events/${event.id}/checkin`}>Open scanner</Link>}
       </div>

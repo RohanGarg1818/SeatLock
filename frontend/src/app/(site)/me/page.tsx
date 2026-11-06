@@ -4,6 +4,8 @@ import { serverFetch, getUser } from '@/lib/server';
 import type { Booking } from '@/lib/types';
 import { fmtDateTime } from '@/lib/format';
 import CancelBooking from '@/components/events/BookingActions';
+import Snapshot from '@/components/ui/Snapshot';
+import { kindOf, posterFor } from '@/lib/kind';
 
 export const metadata = { title: 'My tickets' };
 
@@ -36,9 +38,12 @@ export default async function MyBookings() {
         {bookings.map((b) => (
           <li key={b.id} className="card card-hover p-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="flex items-center gap-4">
+                <span className="hidden w-24 shrink-0 sm:block"><Snapshot src={posterFor({ banner_url: b.event_banner_url ?? null, slug: b.event_slug ?? '' })} kind={kindOf(b.event_title ?? '')} alt="" className="!rounded-2xl" /></span>
               <div>
                 <h2 className="display text-2xl"><Link className="hover:underline underline-offset-4" href={`/e/${b.event_slug}`}>{b.event_title}</Link></h2>
                 <p className="text-muted">{b.event_starts_at && fmtDateTime(b.event_starts_at)} · {b.event_venue}</p>
+              </div>
               </div>
               <span className={`tag ${b.status === 'CONFIRMED' ? 'border-ok text-ok' : b.status === 'HELD' ? 'border-accent text-accent-text' : 'text-muted'}`}>{label[b.status]}</span>
             </div>

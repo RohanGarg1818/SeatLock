@@ -22,7 +22,7 @@ export interface OrganizerEvent extends PublicEvent {
 export interface Booking {
   id: string; event_id: string; status: 'HELD' | 'CONFIRMED' | 'EXPIRED' | 'CANCELLED'; hold_expires_at: string;
   answers: Record<string, unknown> | null; confirmed_at: string | null; checked_in_at: string | null; hold_seconds_left?: number;
-  event_title?: string; event_slug?: string; event_starts_at?: string; event_ends_at?: string; event_venue?: string; event_status?: string;
+  event_title?: string; event_slug?: string; event_banner_url?: string | null; event_starts_at?: string; event_ends_at?: string; event_venue?: string; event_status?: string;
 }
 export interface ApiErrorBody { error: { code: string; message: string; details?: { fields?: Record<string, string>; [k: string]: unknown } } }
 

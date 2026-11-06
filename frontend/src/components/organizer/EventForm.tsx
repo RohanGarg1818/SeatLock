@@ -41,6 +41,15 @@ export default function EventForm({ event, locked = false, onSaved }: { event?: 
     if (file.size > 5 * 1024 * 1024) { setError('That image is over 5 MB. Choose a smaller one.'); return; }
     setUploading(true); setError(null);
     try {
+      if (!cloudinary) {
+        // No Cloudinary on this server: send the picture to our own API, which stores it and hands back a /api/uploads/<id> link.
+        const res = await fetch('/api/uploads/local', { method: 'POST', headers: { 'Content-Type': file.type }, body: file, credentials: 'same-origin' });
+        const json = await res.json().catch(() => null);
+        if (!res.ok || !json?.url) throw new Error(json?.error?.message ?? 'Upload failed');
+        set('banner_url', json.url);
+        setUploading(false);
+        return;
+      }
       const sig = await api<{ upload_url: string; api_key: string; timestamp: number; folder: string; signature: string }>('/uploads/sign', { method: 'POST', body: {} });
       const fd = new FormData();
       fd.append('file', file); fd.append('api_key', sig.api_key); fd.append('timestamp', String(sig.timestamp)); fd.append('folder', sig.folder); fd.append('signature', sig.signature);
@@ -108,10 +117,10 @@ export default function EventForm({ event, locked = false, onSaved }: { event?: 
       {(
         <div>
           <label className="label" htmlFor="banner">Event poster <span className="hint font-normal">(optional, a portrait or square image works best)</span></label>
-          <input id="banner" type="file" accept="image/*" className="field" disabled={uploading || !cloudinary} onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
-          {!cloudinary && <p className="hint mt-1">Poster uploads are switched off on this server. Add the CLOUDINARY_* keys to the API environment to turn them on.</p>}
+          <input id="banner" type="file" accept="image/*" className="field" disabled={uploading} onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
           {uploading && <p className="hint mt-1">Uploading…</p>}
-          {f.banner_url && <div className="mt-2 flex items-center gap-3">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={f.banner_url} alt="Poster preview" className="h-20 border border-line" /><button type="button" className="btn btn-sm" onClick={() => set('banner_url', '')}>Remove</button></div>}
+          {!f.banner_url && !uploading && <p className="hint mt-1">Shown on the event card, the event page and the home page. Without one, a drawn picture stands in.</p>}
+          {f.banner_url && <div className="mt-2 flex items-center gap-3">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={f.banner_url} alt="Poster preview" className="h-28 rounded-2xl border-2 border-ink-line" /><button type="button" className="btn btn-sm" onClick={() => set('banner_url', '')}>Remove</button></div>}
           <Err k="banner_url" />
         </div>
       )}

@@ -4,6 +4,8 @@ import { getUser, serverFetch } from '@/lib/server';
 import type { Booking } from '@/lib/types';
 import { fmtDate, fmtTime } from '@/lib/format';
 import QrTicket from '@/components/events/QrTicket';
+import Snapshot from '@/components/ui/Snapshot';
+import { kindOf, posterFor } from '@/lib/kind';
 
 export const metadata = { title: 'Your ticket' };
 
@@ -18,7 +20,8 @@ export default async function Ticket({ params }: { params: Promise<{ bookingId: 
 
   return (
     <div className="mx-auto max-w-md">
-      <h1 className="display mt-2 text-4xl">{booking.event_title}</h1>
+      <Snapshot src={posterFor({ banner_url: booking.event_banner_url ?? null, slug: booking.event_slug ?? '' })} kind={kindOf(booking.event_title ?? '')} alt={`Poster for ${booking.event_title ?? 'the event'}`} ratio="aspect-[16/9]" className="!rounded-[28px]" />
+      <h1 className="display mt-5 text-4xl">{booking.event_title}</h1>
       <p className="mt-2 text-muted">{booking.event_starts_at && `${fmtDate(booking.event_starts_at)}, ${fmtTime(booking.event_starts_at)}`} · {booking.event_venue}</p>
       <p className="mt-1 font-medium">{user.name}</p>
 
