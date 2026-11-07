@@ -36,14 +36,34 @@ export default function EventForm({ event, locked = false, onSaved }: { event?: 
   // The poster uploader is enabled only when the API says Cloudinary is configured.
   useEffect(() => { api<{ cloudinary_enabled: boolean }>('/config').then((c) => setCloudinary(c.cloudinary_enabled)).catch(() => {}); }, []);
 
+  // Shrinks a photo to at most 1600 px on its longest side and re-encodes it as JPEG (about 200-400 KB). Phone photos are often
+  // 5-10 MB, which is over the limit and over what the hosting platform lets through; posters never need that many pixels.
+  async function shrink(file: File): Promise<Blob> {
+    if (file.type === 'image/gif' && file.size < 1024 * 1024) return file; // keep small animated GIFs as they are
+    try {
+      const bmp = await createImageBitmap(file);
+      const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(bmp.width * scale); canvas.height = Math.round(bmp.height * scale);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return file;
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height); // transparent PNGs get a white background in a JPEG
+      ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/jpeg', 0.86));
+      return blob && blob.size < file.size ? blob : file;
+    } catch { return file; } // an unreadable image: let the server decide
+  }
+
   async function upload(file: File) {
     if (!file.type.startsWith('image/')) { setError('Choose an image file (JPG, PNG or WebP).'); return; }
-    if (file.size > 5 * 1024 * 1024) { setError('That image is over 5 MB. Choose a smaller one.'); return; }
+    if (file.size > 25 * 1024 * 1024) { setError('That image is over 25 MB. Choose a smaller one.'); return; }
     setUploading(true); setError(null);
     try {
+      const picked = await shrink(file);
+      if (picked.size > 4 * 1024 * 1024) throw new Error('That image is still over 4 MB after shrinking. Choose a smaller one.');
       if (!cloudinary) {
         // No Cloudinary on this server: send the picture to our own API, which stores it and hands back a /api/uploads/<id> link.
-        const res = await fetch('/api/uploads/local', { method: 'POST', headers: { 'Content-Type': file.type }, body: file, credentials: 'same-origin' });
+        const res = await fetch('/api/uploads/local', { method: 'POST', headers: { 'Content-Type': picked.type || file.type }, body: picked, credentials: 'same-origin' });
         const json = await res.json().catch(() => null);
         if (!res.ok || !json?.url) throw new Error(json?.error?.message ?? 'Upload failed');
         set('banner_url', json.url);
@@ -52,7 +72,7 @@ export default function EventForm({ event, locked = false, onSaved }: { event?: 
       }
       const sig = await api<{ upload_url: string; api_key: string; timestamp: number; folder: string; signature: string }>('/uploads/sign', { method: 'POST', body: {} });
       const fd = new FormData();
-      fd.append('file', file); fd.append('api_key', sig.api_key); fd.append('timestamp', String(sig.timestamp)); fd.append('folder', sig.folder); fd.append('signature', sig.signature);
+      fd.append('file', picked); fd.append('api_key', sig.api_key); fd.append('timestamp', String(sig.timestamp)); fd.append('folder', sig.folder); fd.append('signature', sig.signature);
       const res = await fetch(sig.upload_url, { method: 'POST', body: fd }); // straight from the browser to Cloudinary
       const json = await res.json();
       if (!res.ok || !json.secure_url) throw new Error(json.error?.message ?? 'Upload failed');

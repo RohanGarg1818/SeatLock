@@ -7,6 +7,7 @@ import { Router } from 'express';
 import express from 'express';
 import { createHash } from 'node:crypto';
 import { AppError } from '../errors.js';
+import { rateLimit } from '../ratelimit.js';
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const UUID = /^[0-9a-f-]{36}$/;
@@ -38,7 +39,8 @@ export default function uploadsRouter(ctx, { requireOrganizer }) {
     });
   });
 
-  r.post('/uploads/local', requireOrganizer, express.raw({ type: () => true, limit: MAX_BYTES }), async (req, res) => {
+  const uploadLimit = rateLimit(ctx, { name: 'poster-upload', limit: 30, windowSec: 3600, by: 'user' }); // keeps the table from filling up
+  r.post('/uploads/local', requireOrganizer, uploadLimit, express.raw({ type: () => true, limit: MAX_BYTES }), async (req, res) => {
     const body = Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0);
     if (body.length === 0) throw new AppError(400, 'VALIDATION', 'Send the image file as the request body.');
     const type = sniff(body);

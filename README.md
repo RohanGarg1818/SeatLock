@@ -303,6 +303,14 @@ Most event sites claim they never oversell. SeatLock lets you try to make it fai
    rewrites that to `API_URL`, which is why the login cookie is first-party and survives browsers that block third-party cookies.
    If you change `API_URL`, redeploy (rewrites are fixed at build time).
 
+**Live deployment checklist (verified wiring: Vercel `/api/health` proxies to the Render API and reports Postgres `ok`).**
+
+- Render `ALLOWED_ORIGINS` must contain the exact Vercel origin (`https://seat-lock-theta.vercel.app`, no trailing slash). A mismatch shows up as "Cross-site request refused." on any form.
+- Migrations (including `005_poster_images.sql`, which enables uploaded event posters without Cloudinary) run automatically when the API starts.
+- `TRUST_PROXY=1` on Render. Requests pass Vercel's rewrite first, so if rate limits ever look shared between users, check the `ip` field in the API request log and raise it to `2`.
+- Run `npm run db:seed` once against the production database to load the demo events and accounts (organizer and attendee logins are printed by the script).
+- Uploaded posters are stored in Postgres (max 5 MB, images are shrunk in the browser first, to stay under Vercel's request body limit).
+
 Free-tier caveats you should expect:
 
 - **Render free web services sleep** after about 15 minutes without traffic, and the first request afterwards takes tens of seconds

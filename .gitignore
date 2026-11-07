@@ -18,3 +18,5 @@ frontend/tsconfig.tsbuildinfo
 .agents/
 .claude/
 skills-lock.json
+
+_to_delete/

@@ -37,6 +37,7 @@ export function requestLogger(log) {
           status: res.statusCode,
           ms: Number(process.hrtime.bigint() - start) / 1e6,
           userId: req.user?.id,
+          ip: req.ip, // check this in the Render logs: it must be the visitor's address, not Vercel's (see TRUST_PROXY in the README)
         });
       });
       next();
